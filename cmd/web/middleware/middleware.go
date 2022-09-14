@@ -9,7 +9,6 @@ import (
 func TokenVer() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		token := c.GetHeader("Authorization")
-
 		if token == "" {
 			// 无权限
 			r := handle.NewResponse(c)
@@ -17,7 +16,7 @@ func TokenVer() gin.HandlerFunc {
 			c.Abort()
 			return
 		} else {
-			/** 权限检验逻辑 */
+			/** 权限检验逻辑 todo */
 		}
 	}
 }
