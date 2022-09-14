@@ -1,7 +1,7 @@
 package router
 
 import (
-	"CloudPlatform/cmd/web/middleware"
+	"CloudPlatform/pkg/middleware"
 	"fmt"
 
 	"github.com/gin-gonic/gin"
