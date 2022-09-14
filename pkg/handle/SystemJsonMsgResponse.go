@@ -32,7 +32,11 @@ func (r *SystemJsonMsgResponse) Success(data interface{}) {
 	r.Ctx.JSON(http.StatusOK, res)
 }
 
-func (r *SystemJsonMsgResponse) Error(code int, message string) {
+func (r *SystemJsonMsgResponse) Error(mc MsgCode) {
+	r.error(mc.Code, mc.Msg)
+}
+
+func (r *SystemJsonMsgResponse) error(code int, message string) {
 	if message == "" {
 		message = ERROR_MSG
 	}

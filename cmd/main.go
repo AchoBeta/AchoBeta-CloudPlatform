@@ -1,7 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"CloudPlatform/cmd/logic"
+)
 
 func main() {
-	fmt.Print("run...\n")
+	logic.Run()
 }
