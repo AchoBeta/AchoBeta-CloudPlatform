@@ -61,7 +61,6 @@ func Listen() *gin.Engine {
 	// v1 模块, 1级权限(需要登陆), 使用Token鉴权中间件
 	v1 := r.Group("/api/v1", middleware.TokenVer())
 	{
-		fmt.Println(len(_hooks_V1))
 		RegisterRouter(_hooks_V1, v1)
 	}
 
