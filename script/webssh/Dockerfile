@@ -6,8 +6,10 @@ WORKDIR $MYPATH
 
 EXPOSE 8888
 
-COPY ./webssh/webssh.sh $MYPATH
+COPY ./webssh.sh $MYPATH
 
 RUN chmod u+x $MYPATH/webssh.sh
 
-RUN nohup $MYPATH/webssh.sh > log.out &
+RUN $MYPATH/webssh.sh
+
+CMD nohup wssh --fbidhttp=False

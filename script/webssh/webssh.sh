@@ -13,6 +13,3 @@ yum -y install --assumeyes python3-pip
 pip3 install --upgrade pip -i https://pypi.tuna.tsinghua.edu.cn/simple/
 # 清华源加速临时安装
 pip3 install webssh -i https://pypi.tuna.tsinghua.edu.cn/simple/
-
-echo "启动 webssh"
-nohup wssh --fbidhttp=False &> ./log.out
