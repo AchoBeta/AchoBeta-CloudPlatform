@@ -1,6 +1,7 @@
 package router
 
 import (
+<<<<<<< HEAD
 	"CloudPlatform/base"
 	"CloudPlatform/conf/secret"
 	"CloudPlatform/pkg/handle"
@@ -21,6 +22,17 @@ func init() {
 	router.Register(func(router gin.IRoutes) {
 		router.POST("/register", Register)
 		router.POST("/login", Login)
+=======
+	"CloudPlatform/pkg/handle"
+	"CloudPlatform/pkg/router"
+
+	"github.com/gin-gonic/gin"
+)
+
+func init() {
+	router.Register(func(router gin.IRoutes) {
+		router.GET("/test", test)
+>>>>>>> master
 	}, router.V0)
 
 	router.Register(func(router gin.IRoutes) {
@@ -28,6 +40,7 @@ func init() {
 	}, router.V1)
 }
 
+<<<<<<< HEAD
 func Login(c *gin.Context) {
 	username := c.PostForm("username")
 	password := c.PostForm("password")
@@ -107,4 +120,9 @@ func createToken(id int64) string {
 	buf := make([]byte, 8)
 	binary.BigEndian.PutUint64(buf, uint64(snowId))
 	return base64.StdEncoding.EncodeToString(buf)
+=======
+func test(c *gin.Context) {
+	r := handle.NewResponse(c)
+	r.Success(nil)
+>>>>>>> master
 }

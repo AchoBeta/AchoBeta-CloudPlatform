@@ -1,15 +1,20 @@
 package main
 
 import (
+<<<<<<< HEAD
 	"CloudPlatform/base"
 	"CloudPlatform/cmd/logic"
 	"CloudPlatform/util"
 	"fmt"
 	"strconv"
+=======
+	"CloudPlatform/cmd/logic"
+>>>>>>> master
 )
 
 func main() {
 	logic.Run()
+<<<<<<< HEAD
 }
 
 func test() {
@@ -21,4 +26,6 @@ func test() {
 	k := "abcp_user_id_" + strconv.FormatInt(u.Id, 10)
 	result := util.Hmset(k, u)
 	fmt.Println(result)
+=======
+>>>>>>> master
 }
