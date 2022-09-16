@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-redis/redis"
 	"github.com/golang/glog"
 )
 
@@ -68,6 +69,10 @@ func Login(c *gin.Context) {
 		return
 	}
 	token := createToken(user.Id)
+	if token == "" {
+		r.Error(handle.INTERNAL_ERROR)
+		return
+	}
 	rdb.Set(token, user.Id, 30*60*time.Second)
 	r.Success(token)
 }
@@ -99,9 +104,16 @@ func Register(c *gin.Context) {
 	// 插入数据库, redis做数据库，需要额外存一个username - uid 的数据
 	key := ABCP_USER_KEY + strconv.FormatInt(id, 10)
 
-	rdb.Set(username, key, -1).Result()
-	result, err := util.Hmset(key, userModel).Result()
+	_, err = rdb.Set(username, key, -1).Result()
+	if err != nil {
+		if err == redis.Nil {
+			r.Error(handle.USER_ACCOUNT_ALREADY_EXIST)
+			return
+		}
+		glog.Errorf("set user username error!")
+	}
 
+	result, err := util.Hmset(key, userModel).Result()
 	if err != nil {
 		glog.Errorf("insert user info error!")
 		r.Error(handle.COMMON_FAIL)
@@ -113,7 +125,7 @@ func Register(c *gin.Context) {
 
 /** 私有方法 */
 func createToken(id int64) string {
-	snowId := util.CreateSnowflake(id)
+	snowId := util.GetNextSnowflakeID()
 	if snowId == -1 {
 		return ""
 	}

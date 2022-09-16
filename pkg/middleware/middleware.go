@@ -33,7 +33,7 @@ func TokenVer() gin.HandlerFunc {
 				c.Abort()
 				return
 			}
-			/** 续期 5分钟 */
+			/** 重置过期时间 30 分钟 */
 			result, err := rdb.Set(token, uid, 30*60*time.Second).Result()
 			if err != nil {
 				glog.Errorf("token extension of time error ! msg: %s", err.Error())
