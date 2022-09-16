@@ -2,13 +2,14 @@ package main
 
 import (
 	"CloudPlatform/base"
+	"CloudPlatform/cmd/logic"
 	"CloudPlatform/util"
 	"fmt"
 	"strconv"
 )
 
 func main() {
-	test()
+	logic.Run()
 }
 
 func test() {
