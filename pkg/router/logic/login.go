@@ -10,6 +10,7 @@ import (
 	"encoding/binary"
 	"encoding/json"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang/glog"
@@ -24,11 +25,21 @@ func init() {
 	}, router.V0)
 
 	router.Register(func(router gin.IRoutes) {
+		router.POST("/logout", Logout)
 		router.GET("/test")
 	}, router.V1)
 }
 
+func Logout(c *gin.Context) {
+	token := c.GetHeader("Authorization")
+	rdb := util.GetRDBClient()
+	r := handle.NewResponse(c)
+	result, _ := rdb.Del(token).Result()
+	r.Success(result)
+}
+
 func Login(c *gin.Context) {
+	rdb := util.GetRDBClient()
 	username := c.PostForm("username")
 	password := c.PostForm("password")
 	r := handle.NewResponse(c)
@@ -56,7 +67,9 @@ func Login(c *gin.Context) {
 		r.Error(handle.USER_CREDENTIALS_ERROR)
 		return
 	}
-	r.Success(createToken(user.Id))
+	token := createToken(user.Id)
+	rdb.Set(token, user.Id, 30*60*time.Second)
+	r.Success(token)
 }
 
 // Register 注册账号, 成功后返回主键id

@@ -22,8 +22,8 @@ AchoBeta-CloudPlatform
 
 ## 目前待完成的工作
 
-- [ ] token 生成策略
-- [ ] token 校验逻辑设计
+- [x] token 生成策略
+- [x] token 校验逻辑设计
 - [ ] Redis 链接、配置、封装等
 - [ ] 登陆模块 包括用户的CRUD接口
 - [ ] dockerfile 生成、上传、自定义
@@ -33,4 +33,4 @@ AchoBeta-CloudPlatform
 - [ ] 登陆链接WebSSH
 - [ ] 容器分发的脚本实现
 - [ ] k8s 模块
-- [ ] 文件上传模块
+- [x] 文件上传模块
