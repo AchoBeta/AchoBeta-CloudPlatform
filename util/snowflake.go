@@ -26,7 +26,7 @@ const (
 )
 
 func CreateSnowflake(id int64) int64 {
-	snow, err := NewSnowflake(id)
+	snow, err := newSnowflake(id)
 	if err != nil {
 		glog.Errorf("create snowflake error ! msg: ", err.Error())
 		return -1
@@ -35,7 +35,7 @@ func CreateSnowflake(id int64) int64 {
 }
 
 // 实例化对象
-func NewSnowflake(workerId int64) (*Snowflake, error) {
+func newSnowflake(workerId int64) (*Snowflake, error) {
 	// 要先检测workerId是否在上面定义的范围内
 	if workerId < 0 || workerId > workerMax {
 		return nil, errors.New("worker ID excess of quantity")

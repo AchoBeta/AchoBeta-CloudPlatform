@@ -21,7 +21,7 @@ import (
 var privateKey, publicKey []byte
 
 func init() {
-	/** 后续应该在这里生成 public.key 和 private_key比较好 */
+	/** 后续应该在这里生成 public_key.pem 和 private_key.pem比较好 */
 	var err error
 	publicKey, err = ioutil.ReadFile("./rsa/rsa_public_key.pem")
 	if err != nil {
