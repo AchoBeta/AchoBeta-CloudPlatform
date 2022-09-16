@@ -16,6 +16,7 @@ type Snowflake struct {
 }
 
 const (
+	machineId   int64 = 1 << 1
 	workerBits  uint8 = 10                      // 节点数
 	seqBits     uint8 = 12                      // 1毫秒内可生成的id序号的二进制位数
 	workerMax   int64 = -1 ^ (-1 << workerBits) // 节点ID的最大值，用于防止溢出
@@ -25,11 +26,22 @@ const (
 	epoch       int64 = 1567906170596           // 开始运行时间
 )
 
-func CreateSnowflake(id int64) int64 {
-	snow, err := newSnowflake(id)
-	if err != nil {
-		glog.Errorf("create snowflake error ! msg: ", err.Error())
-		return -1
+var snow *Snowflake = nil
+var mutex sync.Mutex
+
+func GetNextSnowflakeID() int64 {
+	// 这里用个单例吧
+	if snow == nil {
+		mutex.Lock()
+		defer mutex.Unlock()
+		if snow == nil {
+			var err error
+			snow, err = newSnowflake(machineId)
+			if err != nil {
+				glog.Errorf("create snowflake error ! msg: ", err.Error())
+				return -1
+			}
+		}
 	}
 	return snow.Next()
 }
