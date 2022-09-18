@@ -16,7 +16,7 @@ startDatabase() {
     else
         echo "=====创建并运行 database====="
         docker run -d --name $name --restart unless-stopped \
-            --net host -p $port:$port -v $current_dir/database/data:/data \
+            --net bridge -p $port:$port -v $current_dir/database/data:/data \
             -v $current_dir/database/redis.conf:/etc/redis/redis.conf \
             $organize/$name:$tag redis-server /etc/redis/redis.conf 
     fi

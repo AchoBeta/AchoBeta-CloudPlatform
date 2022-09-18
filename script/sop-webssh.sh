@@ -15,7 +15,7 @@ startWebssh() {
     else
         echo "=====创建并运行 database====="
         docker run -d --name $name --restart unless-stopped \
-            --net host -p $port:$port $orginaze/$name:$tag
+            --net bridge -p $port:$port $orginaze/$name:$tag
     fi
     echo "=====运行成功，请访问：xxxx:8888====="
 }
@@ -39,7 +39,7 @@ updateWebssh() {
     echo "=====删除 webssh 镜像====="
     docker rmi -f  $(docker images | grep $orginaze/$name | awk '{print $3}')
     echo "=====拉取最新 webssh 镜像====="
-    docker pull $name::$tag
+    docker pull $orginaze/$name::$tag
     startWebssh
 }
 
