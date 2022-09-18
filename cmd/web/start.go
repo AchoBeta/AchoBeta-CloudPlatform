@@ -1,8 +1,9 @@
 package web
 
 import (
-	_ "CloudPlatform/conf/secret"
+	//_ "CloudPlatform/conf/secret"
 	"CloudPlatform/pkg/router"
+	_ "CloudPlatform/pkg/router/logic"
 	_ "CloudPlatform/util"
 )
 
