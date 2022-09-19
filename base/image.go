@@ -5,6 +5,6 @@ type Image struct {
 	Name     string `json:"name"`
 	Tag      string `json:"tag"`
 	Size     string `json:"size"`
-	Describe string `json:"describe"`
+	Desc     string `json:"describe"`
 	IsDelete bool   `json:"isDelete"`
 }

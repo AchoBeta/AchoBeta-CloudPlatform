@@ -2,7 +2,7 @@ package base
 
 const (
 	DOCKER            string = "docker"
-	CONTAINER_RUN     string = "run %s"
+	CONTAINER_RUN     string = "run -d %s"
 	CONTAINER_START   string = "start %s"
 	CONTAINER_STOP    string = "stop %s"
 	CONTAINER_RESTART string = "restart %s"
@@ -13,7 +13,7 @@ const (
 	CONTAINER_COMMIT  string = "commit -a %s -m %s %s %s"
 
 	IMAGE_ALL    string = "images"
-	IMAGE_SEARCH string = "search %s"
+	IMAGE_SEARCH string = "search %s --no-trunc"
 	IMAGE_PULL   string = "pull %s"
 	IMAGE_PUSH   string = "push %s"
 	IMAGE_BUILD  string = "build -f %s -t %s ."
