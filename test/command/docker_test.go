@@ -1,4 +1,4 @@
-package test
+package command_test
 
 import (
 	"CloudPlatform/base"
@@ -86,7 +86,7 @@ func TestPushImage(t *testing.T) {
 }
 
 func TestCreateContainer(t *testing.T) {
-	cmd := fmt.Sprintf(base.CONTAINER_RUN, "-d --name hello-world hello-world:latest")
+	cmd := fmt.Sprintf(base.CONTAINER_RUN, "--name hello-world hello-world:latest")
 	out, err := executor(base.DOCKER, cmd)
 	if err != nil {
 		fmt.Println(string(out))
