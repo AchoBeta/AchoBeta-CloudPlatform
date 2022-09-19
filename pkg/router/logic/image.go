@@ -19,7 +19,7 @@ func init() {
 		router.DELETE("/images/:id", deleteImage)
 		router.GET("/images/search", searchImages)
 		router.GET("/images/:id/push", pushImage)
-	}, router.V0)
+	}, router.V1)
 }
 
 // 获取本地所有镜像

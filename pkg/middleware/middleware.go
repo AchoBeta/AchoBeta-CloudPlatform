@@ -44,3 +44,9 @@ func TokenVer() gin.HandlerFunc {
 		}
 	}
 }
+
+func ContainerVer() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// TODO: 校验 containerId —— userId
+	}
+}

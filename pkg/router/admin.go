@@ -53,20 +53,22 @@ func Listen() *gin.Engine {
 
 	/** 路由登记部分 */
 	// v0 模块, 无需权限校验
-	v0 := r.Group("/api/v0")
+	v0 := r.Group("/api")
 	{
 		RegisterRouter(_hooks_V0, v0)
 	}
 
 	// v1 模块, 1级权限(需要登陆), 使用Token鉴权中间件
-	v1 := r.Group("/api/v1", middleware.TokenVer())
+	v1 := r.Group("/api", middleware.TokenVer())
 	{
 		RegisterRouter(_hooks_V1, v1)
 	}
 
-	// v2 模块, 目前无实际意义, 待定
-	v2 := r.Group("/api/v2")
+	// v2 模块, 2级权限(校验token和是否有权操作容器)
+	v2 := r.Group("/api")
 	{
+		r.Use(middleware.TokenVer())
+		r.Use(middleware.ContainerVer())
 		RegisterRouter(_hooks_V2, v2)
 	}
 	return r

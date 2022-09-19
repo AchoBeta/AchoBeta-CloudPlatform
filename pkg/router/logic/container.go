@@ -13,8 +13,11 @@ import (
 func init() {
 	router.Register(func(router gin.IRoutes) {
 		router.POST("/containers", createContainer)
-		router.GET("/containers/:id", getContainer)
 		router.GET("/containers", getContainers)
+	}, router.V1)
+
+	router.Register(func(router gin.IRoutes) {
+		router.GET("/containers/:id", getContainer)
 		router.DELETE("/containers/:id", removeContainer)
 		router.GET("/containsers/:id/start", startContainer)
 		router.GET("/containers/:id/stop", stopContainer)
@@ -22,7 +25,7 @@ func init() {
 		router.GET("/containers/:id/connect", connectContainer)
 		router.POST("/containers/:id/makeImage", makeImage)
 		router.POST("/containers/:id/upload", uploadToContainer)
-	}, router.V0)
+	}, router.V2)
 }
 
 // 创建容器
