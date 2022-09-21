@@ -18,3 +18,5 @@ log/
 vendor/
 # ignore database data
 script/database/data/
+
+.idea/
