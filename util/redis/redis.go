@@ -3,7 +3,6 @@ package redis
 import (
 	"CloudPlatform/util"
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/mitchellh/mapstructure"
@@ -27,25 +26,16 @@ func Connect(ctx context.Context) error {
 	return err
 }
 
-// SetStructToHash /**  存入 struct  **/
-// HMSet不符合原生命令需要更名
-// hmset用于存储结构体
-// 封装的这层不要使用日志，通过抛出 error，让调用方决定是否写日志
-func SetStructToHash(ctx context.Context, key string, value interface{}, ttl int) ([]redis.Cmder, error) {
-	if ttl < 0 {
-		return nil, fmt.Errorf("参数传入错误")
-	}
+// SetStructToHash
+// Zero expiration means the key has no expiration time.
+func SetStructToHash(ctx context.Context, key string, value interface{}, expiration time.Duration) ([]redis.Cmder, error) {
 	pipe := Rdb.Pipeline()
 	pipe.HMSet(ctx, key, util.StructToMap(value))
-	// go-redis 用 0 来表示，所以我们也跟随他
-	if ttl != 0 {
-		pipe.Expire(ctx, key, time.Duration(ttl)*time.Second)
-	}
+	pipe.Expire(ctx, key, expiration)
 	return pipe.Exec(ctx)
 }
 
-// GetHashToStruct /**  获取 struct  **/
-// 传入目标target，将get到的属性与值赋予target
+// GetHashToStruct
 func GetHashToStruct(ctx context.Context, key string, target interface{}) error {
 	result, err := Rdb.HGetAll(ctx, key).Result()
 	if err != nil {

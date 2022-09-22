@@ -3,6 +3,7 @@ package logic
 import (
 	"CloudPlatform/cmd/web"
 	"CloudPlatform/util/redis"
+	"context"
 	"flag"
 	"log"
 
@@ -13,7 +14,7 @@ func Run() {
 	// 日志启动要放在最开始
 	flag.Parse()
 	defer glog.Flush()
-	err := redis.Connect()
+	err := redis.Connect(context.Background())
 	if err != nil {
 		log.Fatal("redis连接失败")
 	}
