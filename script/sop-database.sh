@@ -4,8 +4,9 @@ command=$1
 current_dir=$(cd $(dirname $0); pwd)
 organize=achobeta
 name=abcp_database
-tag=0.1
-port=6379
+tag=0.2
+redis_port=6379
+mongo_port=27018
 
 # 启动数据库
 startDatabase() {
@@ -16,9 +17,11 @@ startDatabase() {
     else
         echo "=====创建并运行 database====="
         docker run -d --name $name --restart unless-stopped \
-            --net bridge -p $port:$port -v $current_dir/database/data:/data \
-            -v $current_dir/database/redis.conf:/etc/redis/redis.conf \
-            $organize/$name:$tag redis-server /etc/redis/redis.conf 
+            --net bridge -p $redis_port:$redis_port -p $mongo_port:$mongo_port \
+            -v $current_dir/database/data/redis:/data/redis \
+            -v $current_dir/database/data/mongo:/data/db \
+            -v $current_dir/database/redis.conf:/usr/local/redis/conf/redis.conf \
+            $organize/$name:$tag
     fi
 }
 
@@ -55,5 +58,5 @@ elif [ $command == "restart" ]; then
 elif [ $command == "update" ]; then
     updateDatabase
 else
-    echo "======命令错误，请重试====="
+	echo "=====命令错误，请重试====="
 fi
