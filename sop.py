@@ -13,17 +13,17 @@ def main():
     parser.add_argument('--all', type=str, help='所有服务管理指令')
     args = parser.parse_args()
     if (args.all):
-        os.system('./sop-database.sh {}'.format(args.all))
-        os.system('./sop-webssh.sh {}'.format(args.all))
-        os.system('./sop-abcp.sh {}'.format(args.all))
+        os.system('./script/sop-database.sh {}'.format(args.all))
+        os.system('./script/sop-webssh.sh {}'.format(args.all))
+        os.system('./script/sop-abcp.sh {}'.format(args.all))
     elif (args.docker):
-        os.system('./sop-docker.sh {}'.format(args.docker))
+        os.system('./script/sop-docker.sh {}'.format(args.docker))
     elif (args.webssh):
-        os.system('./sop-webssh.sh {}'.format(args.webssh))
+        os.system('./script/sop-webssh.sh {}'.format(args.webssh))
     elif (args.abcp):
-        os.system('./sop-abcp.sh {}'.format(args.abcp))
+        os.system('./script/sop-abcp.sh {}'.format(args.abcp))
     elif (args.database):
-        os.system('./sop-database.sh {}'.format(args.database))
+        os.system('./script/sop-database.sh {}'.format(args.database))
     else:
         print('参数错误')
         exit(0)
