@@ -2,11 +2,13 @@
 
 command=$1
 current_dir=$(cd $(dirname $0); pwd)
-organize=achobeta
+organize=159.75.216.233:5000
 name=abcp_database
 tag=0.2
 redis_port=6379
-mongo_port=27018
+mongo_port=27017
+mongo_username=root
+mongo_password=123456
 
 # 启动数据库
 startDatabase() {
@@ -18,10 +20,12 @@ startDatabase() {
         echo "=====创建并运行 database====="
         docker run -d --name $name --restart unless-stopped \
             --net bridge -p $redis_port:$redis_port -p $mongo_port:$mongo_port \
+            -e MONGO_INITDB_ROOT_USERNAME=$mongo_username -e MONGO_INITDB_ROOT_PASSWORD=$mongo_password \
             -v $current_dir/database/data/redis:/data/redis \
-            -v $current_dir/database/data/mongo:/data/db \
+            -v $current_dir/database/data/mongo:/data/mongo \
             -v $current_dir/database/redis.conf:/usr/local/redis/conf/redis.conf \
-            $organize/$name:$tag
+            --privileged=true $organize/$name:$tag
+        docker exec -d $name redis-server /usr/local/redis/conf/redis.conf
     fi
 }
 
