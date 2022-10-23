@@ -1,39 +1,39 @@
 package router_test
 
 import (
-	"CloudPlatform/pkg/handle"
-	"CloudPlatform/util"
+	"CloudPlatform/internal/handle"
+	requestx "CloudPlatform/pkg/request"
 	"fmt"
 	"testing"
 )
 
+const imageId = "ad77059867bd"
+
 func TestGetImages(t *testing.T) {
-	req, _ := util.MakeRequest("GET", "", "/images", nil)
+	req, _ := requestx.MakeRequest("GET", "json", "/api/images", nil)
+	req.Header.Set("Authorization", token)
 	resp := handle.JsonMsgResult{}
 
-	err := util.Request(r, req, &resp)
+	err := requestx.Request(r, req, &resp)
 	if err != nil {
 		t.Error(err)
-		return
 	} else if resp.Code != 200 {
 		t.Errorf(resp.Message)
-		return
 	} else {
 		fmt.Println(resp)
 	}
 }
 
 func TestGetImage(t *testing.T) {
-	req, _ := util.MakeRequest("GET", "", "/images/d7a966a74f16", nil)
+	req, _ := requestx.MakeRequest("GET", "json", "/api/images/"+imageId, nil)
+	req.Header.Set("Authorization", token)
 	resp := handle.JsonMsgResult{}
 
-	err := util.Request(r, req, &resp)
+	err := requestx.Request(r, req, &resp)
 	if err != nil {
 		t.Error(err)
-		return
 	} else if resp.Code != 200 {
 		t.Errorf(resp.Message)
-		return
 	} else {
 		fmt.Println(resp)
 	}
@@ -44,16 +44,15 @@ func TestBuildImage(t *testing.T) {
 }
 
 func TestDeleteImage(t *testing.T) {
-	req, _ := util.MakeRequest("DELETE", "", "/images/d7a966a74f16", nil)
+	req, _ := requestx.MakeRequest("DELETE", "json", "/api/images/"+imageId, nil)
+	req.Header.Set("Authorization", token)
 	resp := handle.JsonMsgResult{}
 
-	err := util.Request(r, req, &resp)
+	err := requestx.Request(r, req, &resp)
 	if err != nil {
 		t.Error(err)
-		return
 	} else if resp.Code != 200 {
 		t.Errorf(resp.Message)
-		return
 	} else {
 		fmt.Println(resp)
 	}
@@ -64,16 +63,14 @@ func TestSearchImages(t *testing.T) {
 	param["image"] = "hello-world"
 	param["tag"] = "latest"
 
-	req, _ := util.MakeRequest("GET", "", "/images/search", param)
+	req, _ := requestx.MakeRequest("GET", "json", "/images/search", param)
 	resp := handle.JsonMsgResult{}
 
-	err := util.Request(r, req, &resp)
+	err := requestx.Request(r, req, &resp)
 	if err != nil {
 		t.Error(err)
-		return
 	} else if resp.Code != 200 {
 		t.Errorf(resp.Message)
-		return
 	} else {
 		fmt.Println(resp)
 	}
@@ -84,16 +81,14 @@ func TestPushImage(t *testing.T) {
 	param["image"] = "hello-world"
 	param["tag"] = "latest"
 
-	req, _ := util.MakeRequest("GET", "", "/images/push", param)
+	req, _ := requestx.MakeRequest("GET", "json", "/images/push", param)
 	resp := handle.JsonMsgResult{}
 
-	err := util.Request(r, req, &resp)
+	err := requestx.Request(r, req, &resp)
 	if err != nil {
 		t.Error(err)
-		return
 	} else if resp.Code != 200 {
 		t.Errorf(resp.Message)
-		return
 	} else {
 		fmt.Println(resp)
 	}

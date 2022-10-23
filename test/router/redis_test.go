@@ -1,12 +1,11 @@
-package test
+package router_test
 
 import (
-	"CloudPlatform/util/redis"
+	"CloudPlatform/global"
+	redisx "CloudPlatform/pkg/redis"
 	"context"
 	"fmt"
 	"testing"
-
-	"github.com/golang/glog"
 )
 
 type Student struct {
@@ -16,25 +15,19 @@ type Student struct {
 
 func TestHSet(t *testing.T) {
 	var ctx = context.Background()
-	err := redis.Connect(ctx)
-	if err != nil {
-		glog.Error(err)
-		return
-	}
-	fmt.Println(redis.Rdb)
-	defer redis.Rdb.Close()
+	defer global.Rdb.Close()
 	stu := Student{
 		Name: "1231",
 		Id:   "1231231",
 	}
-	cmd, err := redis.SetStructToHash(ctx, "test920", stu, 0)
+	cmd, err := redisx.SetStructToRedis(ctx, global.Rdb, "test920", stu, 0)
 	if err != nil {
 		t.Error(err)
 	}
 	fmt.Println(cmd)
 	//Del("test920:")
 	var stud Student
-	redis.GetHashToStruct(ctx, "test920", &stud)
+	redisx.GetStruceFromRedis(ctx, global.Rdb, "test920", &stud)
 	fmt.Println(stud)
-	redis.GetHashToStruct(ctx, "123", "123")
+	redisx.GetStruceFromRedis(ctx, global.Rdb, "123", "123")
 }

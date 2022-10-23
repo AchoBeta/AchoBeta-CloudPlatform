@@ -1,7 +1,7 @@
 package command_test
 
 import (
-	"CloudPlatform/base"
+	"CloudPlatform/internal/base"
 	"fmt"
 	"os/exec"
 	"strings"
@@ -9,7 +9,7 @@ import (
 )
 
 func TestGetImages(t *testing.T) {
-	out, err := executor(base.DOCKER, base.IMAGE_ALL)
+	out, err := executor(base.DOCKER, base.IMAGES, "hello-world:latest")
 	if err != nil {
 		t.Error(err)
 	}
@@ -27,8 +27,7 @@ func TestGetImages(t *testing.T) {
 }
 
 func TestSearchImages(t *testing.T) {
-	cmd := fmt.Sprintf(base.IMAGE_SEARCH, "hello-world")
-	out, err := executor(base.DOCKER, cmd)
+	out, err := executor(base.DOCKER, base.IMAGE_SEARCH, "hello-world")
 	if err != nil {
 		t.Error(err)
 	}
@@ -76,7 +75,7 @@ func TestPullImage(t *testing.T) {
 
 // 案例会不通过
 func TestPushImage(t *testing.T) {
-	cmd := fmt.Sprintf(base.IMAGE_PUSH, "hello-world:latest")
+	cmd := fmt.Sprintf(base.IMAGE_PUSH, "hello-world", "latest")
 	out, err := executor(base.DOCKER, cmd)
 	if err != nil {
 		fmt.Println(string(out))
@@ -152,7 +151,7 @@ func TestContainerRestart(t *testing.T) {
 }
 
 func TestMakeImageByContainer(t *testing.T) {
-	cmd := fmt.Sprintf(base.CONTAINER_COMMIT, "慢慢", "测试", "hello-world", "my-test:0.1")
+	cmd := fmt.Sprintf(base.CONTAINER_COMMIT, "慢慢", "测试", "hello-world", "my-test", "0.1")
 	out, err := executor(base.DOCKER, cmd)
 	if err != nil {
 		t.Log(err)
@@ -181,7 +180,7 @@ func TestUpload(t *testing.T) {
 
 }
 
-func executor(name, arg string) (string, error) {
-	out, err := exec.Command(name, strings.Split(arg, " ")...).Output()
+func executor(name string, args ...string) (string, error) {
+	out, err := exec.Command(name, args...).Output()
 	return string(out), err
 }
