@@ -29,8 +29,11 @@ var (
 	/* 用户错误 2000 ~ 2999 */
 	USER_NOT_LOGIN             = MsgCode{2001, "用户未登录"}
 	USER_PASSWORD_DIFFERENT    = MsgCode{2002, "用户两次密码输入不一致"}
-	USER_CREDENTIALS_ERROR     = MsgCode{2003, "密码错误"}
+	USER_ACCOUNT_NOT_EXIST     = MsgCode{2003, "账号不存在"}
+	USER_CREDENTIALS_ERROR     = MsgCode{2004, "密码错误"}
 	USER_ACCOUNT_ALREADY_EXIST = MsgCode{2008, "账号已存在"}
+	CAPTCHA_ERROR              = MsgCode{2100, "验证码错误"}
+	INSUFFICENT_PERMISSIONS    = MsgCode{2200, "权限不足"}
 
 	/* 镜像错误 3000 ~ 3999 */
 	IMAGE_NOT_FIND    = MsgCode{3001, "镜像未找到"}
@@ -40,11 +43,13 @@ var (
 	IMAGE_REMOVE_FAIL = MsgCode{3005, "镜像删除失败"}
 
 	/* 容器错误 4000 ~ 4999 */
-	CONTAINER_CREATE_FAIL  = MsgCode{4001, "容器创建失败"}
-	CONTAINER_START_FAIL   = MsgCode{4002, "容器启动失败"}
-	CONTAINER_STOP_FAIL    = MsgCode{4003, "容器停止失败"}
-	CONTAINER_RESTART_FAIL = MsgCode{4004, "容器重启失败"}
-	CONTAINER_REMOVE_FAIL  = MsgCode{4005, "容器删除失败"}
+	CONTAINER_NOT_FOUND    = MsgCode{4001, "容器未找到"}
+	CONTAINER_CREATE_FAIL  = MsgCode{4002, "容器创建失败"}
+	CONTAINER_START_FAIL   = MsgCode{4003, "容器启动失败"}
+	CONTAINER_STOP_FAIL    = MsgCode{4004, "容器停止失败"}
+	CONTAINER_RESTART_FAIL = MsgCode{4005, "容器重启失败"}
+	CONTAINER_REMOVE_FAIL  = MsgCode{4006, "容器删除失败"}
+	CONTAINER_IS_DESTORY   = MsgCode{4007, "容器已销毁"}
 
 	/*
 	 USER_NOT_LOGIN(2001, "用户未登录"),

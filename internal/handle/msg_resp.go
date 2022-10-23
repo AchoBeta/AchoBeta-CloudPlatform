@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type SystemJsonMsgResponse struct {
+type JsonMsgResponse struct {
 	Ctx *gin.Context
 }
 
@@ -20,11 +20,11 @@ const SUCCESS_CODE = 200
 const SUCCESS_MSG = "成功"
 const ERROR_MSG = "错误"
 
-func NewResponse(c *gin.Context) *SystemJsonMsgResponse {
-	return &SystemJsonMsgResponse{Ctx: c}
+func NewResponse(c *gin.Context) *JsonMsgResponse {
+	return &JsonMsgResponse{Ctx: c}
 }
 
-func (r *SystemJsonMsgResponse) Success(data interface{}) {
+func (r *JsonMsgResponse) Success(data interface{}) {
 	res := JsonMsgResult{}
 	res.Code = SUCCESS_CODE
 	res.Message = SUCCESS_MSG
@@ -32,11 +32,11 @@ func (r *SystemJsonMsgResponse) Success(data interface{}) {
 	r.Ctx.JSON(http.StatusOK, res)
 }
 
-func (r *SystemJsonMsgResponse) Error(mc MsgCode) {
+func (r *JsonMsgResponse) Error(mc MsgCode) {
 	r.error(mc.Code, mc.Msg)
 }
 
-func (r *SystemJsonMsgResponse) error(code int, message string) {
+func (r *JsonMsgResponse) error(code int, message string) {
 	if message == "" {
 		message = ERROR_MSG
 	}

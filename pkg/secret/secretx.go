@@ -1,4 +1,4 @@
-package secret
+package secretx
 
 import (
 	"crypto/rand"
