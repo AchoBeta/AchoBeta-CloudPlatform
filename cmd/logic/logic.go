@@ -2,25 +2,16 @@ package logic
 
 import (
 	"CloudPlatform/cmd/web"
-	"CloudPlatform/util/redis"
-	"context"
+	_ "CloudPlatform/internal/router/api"
 	"flag"
-	"log"
-
-	"github.com/golang/glog"
 )
 
 func Run() {
-	// 日志启动要放在最开始
 	flag.Parse()
-	defer glog.Flush()
-	err := redis.Connect(context.Background())
-	if err != nil {
-		log.Fatal("redis连接失败")
-	}
-	defer redis.Rdb.Close()
-	// 读配置相关的可以放在这
-
+	// 初始化工程
+	Init("./config.yaml")
+	// 工程进入前夕，释放资源
+	defer Eve()
 	/** gin 启动要放在最后*/
 	web.Run()
 }
