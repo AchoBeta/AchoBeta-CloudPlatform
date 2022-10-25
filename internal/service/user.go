@@ -45,8 +45,8 @@ func Login(username, password, captcha string, dtoUser *base.DTOUser) (error, in
 		return err, 5, ""
 	}
 	token := createToken()
-	str, _ := commonx.StuctToJson(user)
-	cmd1 := global.Rdb.Set(fmt.Sprintf(base.TOKEN, token), str, 30*time.Minute)
+	str, _ := commonx.StructToJson(&user)
+	cmd1 := global.Rdb.Set(context.TODO(), fmt.Sprintf(base.TOKEN, token), str, 30*time.Minute)
 	if cmd1.Err() != nil {
 		return cmd1.Err(), 6, ""
 	}

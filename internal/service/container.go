@@ -1,8 +1,9 @@
 package service
 
 import (
-	"cloud-platform/global"
-	"cloud-platform/internal/base"
+	"CloudPlatform/global"
+	"CloudPlatform/internal/base"
+	commonx "CloudPlatform/pkg/common"
 	"cloud-platform/internal/base/cloud"
 	"cloud-platform/internal/base/constant"
 	"context"
@@ -16,7 +17,7 @@ import (
 )
 
 // 创建 Docker 容器
-func CreateDockerContainer(container *cloud.Container, user *base.User) (error, int8) {
+func CreateDockerContainer(token string, container *base.Container, user *base.User) (error, int8) {
 	container.Ip = global.Machine.Ip
 	cmd := splitContainerCmd(container)
 	out, err := exec.Command(constant.DOCKER, cmd...).Output()
@@ -33,20 +34,24 @@ func CreateDockerContainer(container *cloud.Container, user *base.User) (error, 
 	}
 	container.Status = 0
 	container.StartTime = time.Now().Unix()
+	// 添加到数据库
 	collection := global.GetMgoDb("abcp").Collection("container")
 	_, err = collection.InsertOne(context.TODO(), container)
 	if err != nil {
 		return err, 2
 	}
+	// user 表更新并同步到缓存
 	collection = global.GetMgoDb("abcp").Collection("user")
-	filter := bson.M{"_id": user.Id}
-	res := collection.FindOne(context.TODO(), filter)
-	user1 := &base.User{}
-	res.Decode(user1)
 	update := bson.M{"$push": bson.M{"containers": container.Id}}
-	_, err = collection.UpdateOne(context.TODO(), filter, update)
+	_, err = collection.UpdateByID(context.TODO(), user.Id, update)
 	if err != nil {
 		return err, 3
+	}
+	user.Containers = append(user.Containers, container.Id)
+	str, _ := commonx.StructToJson(&user)
+	cmd1 := global.Rdb.Set(context.TODO(), fmt.Sprintf(base.TOKEN, token), str, 30*time.Minute)
+	if cmd1.Err() != nil {
+		return cmd1.Err(), 4
 	}
 	return nil, 0
 }
@@ -96,8 +101,8 @@ func GetContainers(user *base.User) (error, int8, []cloud.Container) {
 }
 
 // 删除 Docker 容器
-func RemoveDockerContainer(containerId string, userId string) (error, int8) {
-	_, err := exec.Command(constant.DOCKER, constant.CONTAINER_RM, "-f", containerId).Output()
+func RemoveDockerContainer(token string, containerId string, user *base.User) (error, int8) {
+	_, err := exec.Command(base.DOCKER, base.CONTAINER_RM, "-f", containerId).Output()
 	if err != nil {
 		return err, 1
 	}
@@ -107,9 +112,23 @@ func RemoveDockerContainer(containerId string, userId string) (error, int8) {
 		return err, 2
 	}
 	collection = global.GetMgoDb("abcp").Collection("user")
-	_, err = collection.UpdateByID(context.TODO(), userId, bson.M{"$pull": bson.M{"containers": containerId}})
+	_, err = collection.UpdateByID(context.TODO(), user.Id, bson.M{"$pull": bson.M{"containers": containerId}})
 	if err != nil {
 		return err, 3
+	}
+	// 更新缓存
+	index := len(user.Containers)
+	for i, v := range user.Containers {
+		if v == containerId {
+			index = i
+			break
+		}
+	}
+	user.Containers = append(user.Containers[:index], user.Containers[index+1:]...)
+	str, _ := commonx.StructToJson(&user)
+	res := global.Rdb.Set(context.TODO(), fmt.Sprintf(base.TOKEN, token), str, 30*time.Minute)
+	if res.Err() != nil {
+		return err, 4
 	}
 	return nil, 0
 }
@@ -224,9 +243,8 @@ func splitContainerCmd(container *cloud.Container) []string {
 		}
 	}
 	container.Ports = global.Machine.StartPort
-	strs = append(strs, "-p", fmt.Sprintf("%d:22", container.Ports))
-	strs = append(strs, "-p", fmt.Sprintf("%d:23", container.Ports+1))
-	for i := 0; i < 8; i++ {
+	container.Param.Ports = append([]int{22, 23}, container.Param.Ports...)
+	for i := 0; i < 10; i++ {
 		if container.Param.Ports != nil && i < len(container.Param.Ports) {
 			strs = append(strs, "-p", fmt.Sprintf("%d:%d", container.Ports+i+2, container.Param.Ports[i]))
 		} else {

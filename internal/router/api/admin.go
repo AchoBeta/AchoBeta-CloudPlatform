@@ -17,7 +17,7 @@ func init() {
 	router.Register(func(router gin.IRoutes) {
 		router.GET("/unverity_users", getUnVerityUsers)
 		router.POST("/verity_user/:id", verityUser)
-		router.GET("/set-admin/:id", setAdmin)
+		router.POST("/set-admin/:id", setAdmin)
 	}, router.V2)
 }
 

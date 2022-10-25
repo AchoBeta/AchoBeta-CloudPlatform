@@ -21,7 +21,7 @@ func TokenVer() gin.HandlerFunc {
 		token := c.GetHeader("Authorization")
 		if token == "" {
 			// 无权限
-			r.Ctx.Header("WWW-Authenticate", "Basic")
+			r.Ctx.Header("WWW-Authenticate", "Bearer")
 			r.Ctx.Status(401)
 			c.Abort()
 			return

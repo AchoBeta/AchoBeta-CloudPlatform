@@ -113,7 +113,7 @@ func initRedis() {
 func initBaseImage() {
 	collection := global.GetMgoDb("abcp").Collection("image")
 	imageName := fmt.Sprintf("%s/abcp_base", global.Config.Docker.Hub.Host)
-	filter := bson.D{{Key: "name", Value: imageName}}
+	filter := bson.M{"name": imageName}
 	res := collection.FindOne(context.TODO(), filter)
 	if res.Err() != nil {
 		if res.Err() == mongo.ErrNoDocuments {
@@ -123,15 +123,14 @@ func initBaseImage() {
 			if err != nil {
 				glog.Errorf("[cmd] pull base images error ! msg: %s\n", err.Error())
 			}
-			out, err := exec.Command(constant.DOCKER, constant.IMAGES, imageName+"0.1").Output()
+			out, err := exec.Command(base.DOCKER, base.IMAGES, imageName+":0.1").Output()
 			if err != nil {
 				glog.Errorf("[cmd] search base images error ! msg: %s\n", err.Error())
 				return
 			}
 			r := regexp.MustCompile(`[^\\s]+`)
 			ss := r.FindAllString(strings.Split(string(out), "\n")[1], -1)
-			fmt.Print(ss)
-			image := cloud.Image{
+			image := base.Image{
 				Name:       ss[0],
 				Tag:        ss[1],
 				Id:         ss[2],
@@ -155,7 +154,7 @@ func initBaseImage() {
 func initMachineInfo() {
 	// 从数据库读取
 	collection := global.GetMgoDb("abcp").Collection("machine")
-	filter := bson.D{{Key: "_id", Value: "1"}}
+	filter := bson.M{"_id": "1"}
 	res := collection.FindOne(context.TODO(), filter)
 	global.Machine = &cloud.Machine{}
 	if res.Err() != nil {

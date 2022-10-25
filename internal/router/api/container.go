@@ -26,7 +26,7 @@ func init() {
 		router.GET("/containers/:id/start", startContainer)
 		router.GET("/containers/:id/stop", stopContainer)
 		router.GET("/containers/:id/restart", restartContainer)
-		router.POST("/containers/:id/makeImage", makeImage)
+		router.POST("/containers/:id/make-image", makeImage)
 		router.GET("/containers/:id/log", getContainerLog)
 	}, router.V3)
 }
@@ -43,7 +43,7 @@ func createContainer(c *gin.Context) {
 	}
 	var code int8
 	if global.Config.App.Type == "docker" {
-		err, code = service.CreateDockerContainer(container, user.(*base.User))
+		err, code = service.CreateDockerContainer(c.GetHeader("Authorization"), container, user.(*base.User))
 	} else {
 		err, code = service.CreateK8SContainer(container)
 	}
@@ -56,7 +56,7 @@ func createContainer(c *gin.Context) {
 	} else if code == 2 {
 		glog.Errorf("[cmd] set container ssh pwd error ! msg: %s\n", err.Error())
 		r.Error(handle.INTERNAL_ERROR)
-	} else if code == 3 {
+	} else if code == 3 || code == 4 {
 		glog.Errorf("[db] insert container error ! msg: %s\n", err.Error())
 		r.Error(handle.INTERNAL_ERROR)
 	}
@@ -105,7 +105,7 @@ func removeContainer(c *gin.Context) {
 	var err error
 	var code int8
 	if global.Config.App.Type == "docker" {
-		err, code = service.RemoveDockerContainer(id, user.(*base.User).Id)
+		err, code = service.RemoveDockerContainer(c.GetHeader("Authorization"), id, user.(*base.User))
 	} else {
 		err, code = service.RemoveK8SContainer(id)
 	}
@@ -117,7 +117,7 @@ func removeContainer(c *gin.Context) {
 	} else if code == 2 {
 		glog.Errorf("[db] delete container error ! msg: %s\n", err.Error())
 		r.Error(handle.CONTAINER_REMOVE_FAIL)
-	} else if code == 3 {
+	} else if code == 3 || code == 4 {
 		glog.Errorf("[db] update user containers error ! msg: %s\n", err.Error())
 		r.Error(handle.INTERNAL_ERROR)
 	}
