@@ -22,7 +22,7 @@ func init() {
 		router.POST("/login", login)
 		router.GET("/captcha", captcha1)
 		router.GET("/lark-login-page", larkLoginPage)
-		router.POST("lark-login", larkLogin)
+		router.GET("lark-login", larkLogin)
 	}, router.V0)
 
 	router.Register(func(router gin.IRoutes) {
@@ -128,7 +128,7 @@ func larkLoginPage(c *gin.Context) {
 }
 
 func larkLogin(c *gin.Context) {
-	code := c.PostForm("code")
+	code := c.Query("code")
 	r := handle.NewResponse(c)
 	if code == "" {
 		r.Error(handle.PARAM_IS_BLANK)
