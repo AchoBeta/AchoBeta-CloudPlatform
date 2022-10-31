@@ -21,6 +21,8 @@ func init() {
 		router.POST("/register", register)
 		router.POST("/login", login)
 		router.GET("/captcha", captcha1)
+		router.GET("/lark-login-page", larkLoginPage)
+		router.POST("lark-login", larkLogin)
 	}, router.V0)
 
 	router.Register(func(router gin.IRoutes) {
@@ -118,6 +120,21 @@ func captcha1(c *gin.Context) {
 		r := handle.NewResponse(c)
 		r.Error(handle.INTERNAL_ERROR)
 	}
+}
+
+func larkLoginPage(c *gin.Context) {
+	c.Redirect(http.StatusMovedPermanently, fmt.Sprintf(global.LARK_LOGIN_PAGE_URL,
+		global.Config.App.Lark.AppId, global.Config.App.Lark.RedirectUrl, "11111"))
+}
+
+func larkLogin(c *gin.Context) {
+	code := c.PostForm("code")
+	r := handle.NewResponse(c)
+	if code == "" {
+		r.Error(handle.PARAM_IS_BLANK)
+		return
+	}
+	service.LarkLogin(code)
 }
 
 func getUsers(c *gin.Context) {

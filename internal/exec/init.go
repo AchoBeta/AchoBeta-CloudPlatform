@@ -8,6 +8,7 @@ import (
 
 	"context"
 	"fmt"
+	"net/http"
 	"os"
 	"os/exec"
 	"regexp"
@@ -28,6 +29,7 @@ func Init(file string) {
 	initRedis()
 	initMachineInfo()
 	initBaseImage()
+    global.HttpClient = http.DefaultClient
 }
 
 func readConfig(file string) {

@@ -1,18 +1,23 @@
 package service
 
 import (
-	"cloud-platform/global"
-	"cloud-platform/internal/base"
-	"cloud-platform/internal/base/config"
-	commonx "cloud-platform/internal/pkg/common"
+	"CloudPlatform/config"
+	"CloudPlatform/global"
+	"CloudPlatform/internal/base"
+	"CloudPlatform/internal/handle"
+	commonx "CloudPlatform/pkg/common"
+	requestx "CloudPlatform/pkg/request"
 	"context"
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/binary"
+	"encoding/json"
 	"fmt"
+	"io"
 	"time"
 
-	"github.com/go-redis/redis"
+	"github.com/go-redis/redis/v9"
+	"github.com/golang/glog"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -126,4 +131,26 @@ func GetUsers(user *base.DTOUser) (int8, []base.DTOUser, error) {
 		users = append(users, dtoUser)
 	}
 	return 0, users, nil
+}
+
+func LarkLogin(code string) {
+	param := map[string]string{
+		"grant_type":    "authorization_code",
+		"client_id":     global.Config.App.Lark.AppId,
+		"client_secret": global.Config.App.Lark.AppSecret,
+		"code":          code,
+		"redirect_uri":  global.Config.App.Lark.RedirectUrl,
+	}
+	req, _ := requestx.MakeRequest("POST", "form", global.LARK_ACCESS_TOKEN_URL, param)
+	result, err := global.HttpClient.Do(req)
+	if err != nil {
+		return
+	}
+	defer result.Body.Close()
+
+	// extract response body
+	resp := handle.JsonMsgResult{}
+	bodyByte, _ := io.ReadAll(result.Body)
+	json.Unmarshal(bodyByte, &resp)
+	glog.Errorf("%v", resp)
 }

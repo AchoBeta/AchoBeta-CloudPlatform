@@ -7,4 +7,5 @@ type App struct {
 	Port      int    `yaml:"port" json:"port"`
 	StartPort int    `yaml:"startPort" json:"startPort"`
 	Salt      string `yaml:"salt" json:"salt"`
+    Lark Lark `yaml:"lark" json:"lark"`
 }
