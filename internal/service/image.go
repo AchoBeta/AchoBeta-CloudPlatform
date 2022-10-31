@@ -3,7 +3,6 @@ package service
 import (
 	"cloud-platform/global"
 	"cloud-platform/internal/base/cloud"
-	"cloud-platform/internal/base/constant"
 	"context"
 	"os/exec"
 
@@ -11,61 +10,61 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func GetImages() (error, int8, []cloud.Image) {
+func GetImages() (int8, []base.Image, error) {
 	collection := global.GetMgoDb("abcp").Collection("image")
 	cur, err := collection.Find(context.TODO(), bson.M{"isDelete": false})
 	if err != nil {
-		return err, 1, nil
+		return 1, nil, err
 	}
 	images := []cloud.Image{}
 	for cur.Next(context.TODO()) {
 		image := cloud.Image{}
 		err = cur.Decode(&image)
 		if err != nil {
-			return err, 2, nil
+			return 2, nil, err
 		}
 		images = append(images, image)
 	}
-	return nil, 0, images
+	return 0, images, nil
 }
 
-func GetImageInfo(imageId string, image *cloud.Image) (error, int8) {
+func GetImageInfo(imageId string, image *base.Image) (int8, error) {
 	collection := global.GetMgoDb("abcp").Collection("image")
 	res := collection.FindOne(context.TODO(), bson.M{"_id": imageId})
 	if res.Err() != nil {
 		if res.Err() == mongo.ErrNilDocument {
-			return res.Err(), 1
+			return 1, res.Err()
 		} else {
-			return res.Err(), 2
+			return 2, res.Err()
 		}
 	}
 	res.Decode(&image)
-	return nil, 0
+	return 0, nil
 }
 
-func DeleteImage(imageId string) (error, int8) {
+func DeleteImage(imageId string) (int8, error) {
 	// TODO: 删除数据库
 	collection := global.GetMgoDb("abcp").Collection("image")
-	update := bson.D{{Key: "$set", Value: bson.D{{Key: "isDelete", Value: "true"}}}}
+	update := bson.M{"$set": bson.M{"isDelete": "true"}}
 	_, err := collection.UpdateByID(context.TODO(), imageId, update)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
-			return err, 1
+			return 1, err
 		} else {
-			return err, 2
+			return 2, err
 		}
 	}
-	return err, 0
+	return 0, nil
 }
 
-func PushDockerImage(imageName string) (error, int8) {
-	_, err := exec.Command(constant.DOCKER, constant.IMAGE_PUSH, imageName).Output()
+func PushDockerImage(imageName string) (int8, error) {
+	_, err := exec.Command(base.DOCKER, base.IMAGE_PUSH, imageName).Output()
 	if err != nil {
-		return err, 1
+		return 1, err
 	}
-	return err, 0
+	return 0, err
 }
 
-func PushK8SImage(imageName string) (error, int8) {
-	return nil, 0
+func PushK8SImage(imageName string) (int8, error) {
+	return 0, nil
 }

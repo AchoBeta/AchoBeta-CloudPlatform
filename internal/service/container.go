@@ -8,7 +8,6 @@ import (
 	"cloud-platform/internal/base/constant"
 	"context"
 	"fmt"
-
 	"os/exec"
 	"time"
 
@@ -17,12 +16,12 @@ import (
 )
 
 // 创建 Docker 容器
-func CreateDockerContainer(token string, container *base.Container, user *base.User) (error, int8) {
+func CreateDockerContainer(token string, container *base.Container, user *base.User) (int8, error) {
 	container.Ip = global.Machine.Ip
 	cmd := splitContainerCmd(container)
 	out, err := exec.Command(constant.DOCKER, cmd...).Output()
 	if err != nil {
-		return err, 1
+		return 1, err
 	}
 	container.Id = string(out[:len(out)-1])
 	container.Username = "root"
@@ -30,7 +29,7 @@ func CreateDockerContainer(token string, container *base.Container, user *base.U
 	_, err = exec.Command(constant.DOCKER, constant.CONTAINER_EXEC, "-d", container.Name,
 		"/bin/sh", "/bin/passwd.sh", container.Password).Output()
 	if err != nil {
-		return err, 2
+		return 2, err
 	}
 	container.Status = 0
 	container.StartTime = time.Now().Unix()
@@ -38,54 +37,54 @@ func CreateDockerContainer(token string, container *base.Container, user *base.U
 	collection := global.GetMgoDb("abcp").Collection("container")
 	_, err = collection.InsertOne(context.TODO(), container)
 	if err != nil {
-		return err, 2
+		return 2, err
 	}
 	// user 表更新并同步到缓存
 	collection = global.GetMgoDb("abcp").Collection("user")
 	update := bson.M{"$push": bson.M{"containers": container.Id}}
 	_, err = collection.UpdateByID(context.TODO(), user.Id, update)
 	if err != nil {
-		return err, 3
+		return 3, err
 	}
 	user.Containers = append(user.Containers, container.Id)
 	str, _ := commonx.StructToJson(&user)
 	cmd1 := global.Rdb.Set(context.TODO(), fmt.Sprintf(base.TOKEN, token), str, 30*time.Minute)
 	if cmd1.Err() != nil {
-		return cmd1.Err(), 4
+		return 4, cmd1.Err()
 	}
-	return nil, 0
+	return 0, nil
 }
 
 // 创建 K8S 容器
-func CreateK8SContainer(container *cloud.Container) (error, int8) {
-	return nil, 0
+func CreateK8SContainer(container *base.Container) (int8, error) {
+	return 0, nil
 }
 
 // 根据 id 获取容器信息
-func GetContainer(containerId string, container *cloud.Container) (error, int8) {
+func GetContainer(containerId string, container *base.Container) (int8, error) {
 	collection := global.GetMgoDb("abcp").Collection("container")
 	filter := bson.M{"_id": containerId}
 	res := collection.FindOne(context.TODO(), filter)
 	if res.Err() != nil {
 		if res.Err() == mongo.ErrNoDocuments {
-			return res.Err(), 1
+			return 1, res.Err()
 		} else {
-			return res.Err(), 2
+			return 2, res.Err()
 		}
 	}
 	err := res.Decode(container)
 	if err != nil {
-		return err, 3
+		return 3, err
 	}
-	return nil, 0
+	return 0, nil
 }
 
-func GetContainers(user *base.User) (error, int8, []cloud.Container) {
+func GetContainers(user *base.User) (int8, []base.Container, error) {
 	collection := global.GetMgoDb("abcp").Collection("container")
 	filter := bson.M{"_id": bson.M{"$in": user.Containers}}
 	cur, err := collection.Find(context.TODO(), filter)
 	if err != nil {
-		return err, 1, nil
+		return 1, nil, err
 	}
 	defer cur.Close(context.TODO())
 	containers := []cloud.Container{}
@@ -93,28 +92,28 @@ func GetContainers(user *base.User) (error, int8, []cloud.Container) {
 		container := cloud.Container{}
 		err = cur.Decode(&container)
 		if err != nil {
-			return err, 2, nil
+			return 2, nil, err
 		}
 		containers = append(containers, container)
 	}
-	return nil, 0, containers
+	return 0, containers, nil
 }
 
 // 删除 Docker 容器
-func RemoveDockerContainer(token string, containerId string, user *base.User) (error, int8) {
+func RemoveDockerContainer(token string, containerId string, user *base.User) (int8, error) {
 	_, err := exec.Command(base.DOCKER, base.CONTAINER_RM, "-f", containerId).Output()
 	if err != nil {
-		return err, 1
+		return 1, err
 	}
 	collection := global.GetMgoDb("abcp").Collection("container")
 	_, err = collection.DeleteOne(context.TODO(), bson.M{"_id": containerId})
 	if err != nil {
-		return err, 2
+		return 2, err
 	}
 	collection = global.GetMgoDb("abcp").Collection("user")
 	_, err = collection.UpdateByID(context.TODO(), user.Id, bson.M{"$pull": bson.M{"containers": containerId}})
 	if err != nil {
-		return err, 3
+		return 3, err
 	}
 	// 更新缓存
 	index := len(user.Containers)
@@ -128,110 +127,110 @@ func RemoveDockerContainer(token string, containerId string, user *base.User) (e
 	str, _ := commonx.StructToJson(&user)
 	res := global.Rdb.Set(context.TODO(), fmt.Sprintf(base.TOKEN, token), str, 30*time.Minute)
 	if res.Err() != nil {
-		return err, 4
+		return 4, err
 	}
-	return nil, 0
+	return 0, nil
 }
 
 // 删除 K8S 容器
-func RemoveK8SContainer(containerId string) (error, int8) {
-	return nil, 0
+func RemoveK8SContainer(containerId string) (int8, error) {
+	return 0, nil
 }
 
 // 开启 Docker 容器
-func StartDockerContainer(containerId string) (error, int8) {
-	_, err := exec.Command(constant.DOCKER, constant.CONTAINER_START, containerId).Output()
+func StartDockerContainer(containerId string) (int8, error) {
+	_, err := exec.Command(base.DOCKER, base.CONTAINER_START, containerId).Output()
 	if err != nil {
-		return err, 1
+		return 1, err
 	}
 	collection := global.GetMgoDb("abcp").Collection("container")
 	update := bson.M{"$set": bson.M{"status": 0, "startTime": time.Now().Unix()}}
 	_, err = collection.UpdateByID(context.TODO(), containerId, update)
 	if err != nil {
-		return err, 2
+		return 2, err
 	}
-	return nil, 0
+	return 0, nil
 }
 
 // 开启 K8S 容器
-func StartK8SContainer(containerId string) (error, int8) {
-	return nil, 0
+func StartK8SContainer(containerId string) (int8, error) {
+	return 0, nil
 }
 
 // 停止 Docker 容器
-func StopDockerContainer(containerId string) (error, int8) {
-	_, err := exec.Command(constant.DOCKER, constant.CONTAINER_STOP, containerId).Output()
+func StopDockerContainer(containerId string) (int8, error) {
+	_, err := exec.Command(base.DOCKER, base.CONTAINER_STOP, containerId).Output()
 	if err != nil {
-		return err, 1
+		return 1, err
 	}
 	collection := global.GetMgoDb("abcp").Collection("container")
 	update := bson.M{"$set": bson.M{"status": 1}}
 	_, err = collection.UpdateByID(context.TODO(), containerId, update)
 	if err != nil {
-		return err, 2
+		return 2, err
 	}
-	return nil, 0
+	return 0, nil
 }
 
 // 停止 K8S 容器
-func StopK8SContainer(containerId string) (error, int8) {
-	return nil, 0
+func StopK8SContainer(containerId string) (int8, error) {
+	return 0, nil
 }
 
 // 重启 Docker 容器
-func RestartDockerContainer(containerId string) (error, int8) {
-	_, err := exec.Command(constant.DOCKER, constant.CONTAINER_RESTART, containerId).Output()
+func RestartDockerContainer(containerId string) (int8, error) {
+	_, err := exec.Command(base.DOCKER, base.CONTAINER_RESTART, containerId).Output()
 	if err != nil {
-		return err, 1
+		return 1, err
 	}
 	collection := global.GetMgoDb("abcp").Collection("container")
 	filter := bson.M{"containerId": containerId}
 	update := bson.M{"$set": bson.M{"Status": 0}}
 	_, err = collection.UpdateOne(context.TODO(), filter, update)
 	if err != nil {
-		return err, 2
+		return 2, err
 	}
-	return nil, 0
+	return 0, nil
 }
 
 // 重启 K8S 容器
-func RestartK8SContainer(containerId string) (error, int8) {
-	return nil, 0
+func RestartK8SContainer(containerId string) (int8, error) {
+	return 0, nil
 }
 
 // 根据 Docker 容器制作镜像
-func MakeDockerImage(containerId string, image *cloud.Image) (error, int8) {
-	out, err := exec.Command(constant.DOCKER, constant.CONTAINER_COMMIT, "-a", image.Author,
+func MakeDockerImage(containerId string, image *base.Image) (int8, error) {
+	out, err := exec.Command(base.DOCKER, base.CONTAINER_COMMIT, "-a", image.Author,
 		"-m", image.Desc, containerId, image.Name+":"+image.Tag).Output()
 	if err != nil {
-		return err, 1
+		return 1, err
 	}
 	image.Id = string(out[7:19])
 	collection := global.GetMgoDb("abcp").Collection("image")
 	_, err = collection.InsertOne(context.TODO(), image)
 	if err != nil {
-		return err, 2
+		return 2, err
 	}
-	return nil, 0
+	return 3, nil
 }
 
 // 根据 K8S 容器制作镜像
-func MakeK8SImage(containerId string, image *cloud.Image) (error, int8) {
-	return nil, 0
+func MakeK8SImage(containerId string, image *base.Image) (int8, error) {
+	return 0, nil
 }
 
 // 获取 Docker 容器日志
-func GetDockerContainerLog(containerId string) (error, int8, string) {
-	out, err := exec.Command(constant.DOCKER, constant.CONTAINER_LOG, containerId).Output()
+func GetDockerContainerLog(containerId string) (int8, string, error) {
+	out, err := exec.Command(base.DOCKER, base.CONTAINER_LOG, containerId).Output()
 	if err != nil {
-		return err, 1, ""
+		return 1, "", err
 	}
-	return nil, 0, string(out)
+	return 0, string(out), nil
 }
 
 // 获取 K8S 容器日志
-func GetK8SContainerLog(containerId string) (error, int8, string) {
-	return nil, 0, ""
+func GetK8SContainerLog(containerId string) (int8, string, error) {
+	return 0, "", nil
 }
 
 func splitContainerCmd(container *cloud.Container) []string {
@@ -250,7 +249,6 @@ func splitContainerCmd(container *cloud.Container) []string {
 		} else {
 			strs = append(strs, "-p", fmt.Sprintf("%d:%d", container.Ports+i+2, container.Ports+i+1))
 		}
-
 	}
 	global.Machine.StartPort += 10
 	if container.Param.HostName != "" {

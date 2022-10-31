@@ -8,9 +8,9 @@ import (
 	commonx "cloud-platform/internal/pkg/common"
 	"cloud-platform/internal/router"
 	_ "cloud-platform/internal/router/api"
+	"context"
 	"fmt"
 	"net/http"
-
 	"time"
 )
 
@@ -36,8 +36,8 @@ func setTokenToRedis() {
 		Containers: []string{containerId},
 		Pow:        config.ADMIN_POW,
 	}
-	str, _ := commonx.StuctToJson(user)
-	global.Rdb.Set(fmt.Sprintf(base.TOKEN, token), str, 5*time.Minute)
+	str, _ := commonx.StructToJson(user)
+	global.Rdb.Set(context.TODO(), fmt.Sprintf(base.TOKEN, token), str, 5*time.Minute)
 }
 
 func setCaptchaToRedis() {

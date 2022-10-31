@@ -2,7 +2,6 @@ package api
 
 import (
 	"cloud-platform/global"
-	"cloud-platform/internal/base/cloud"
 	"cloud-platform/internal/handle"
 	"cloud-platform/internal/router"
 	"cloud-platform/internal/service"
@@ -28,7 +27,7 @@ func init() {
 func getImages(c *gin.Context) {
 	// TODO: 查数据库
 	r := handle.NewResponse(c)
-	err, code, images := service.GetImages()
+	code, images, err := service.GetImages()
 	if code == 0 {
 		r.Success(images)
 	} else if code == 1 {
@@ -44,8 +43,8 @@ func getImages(c *gin.Context) {
 func getImageInfo(c *gin.Context) {
 	r := handle.NewResponse(c)
 	id := c.Param("id")
-	image := &cloud.Image{}
-	err, code := service.GetImageInfo(id, image)
+	image := &base.Image{}
+	code, err := service.GetImageInfo(id, image)
 	if code == 0 {
 		r.Success(image)
 	} else if code == 1 {
@@ -76,7 +75,7 @@ func getImageInfo(c *gin.Context) {
 func deleteImage(c *gin.Context) {
 	r := handle.NewResponse(c)
 	id := c.Param("id")
-	err, code := service.DeleteImage(id)
+	code, err := service.DeleteImage(id)
 	if code == 0 {
 		r.Success(nil)
 	} else if code == 1 {
@@ -114,9 +113,9 @@ func pushImage(c *gin.Context) {
 	var err error
 	var code int8
 	if global.Config.App.Type == "docker" {
-		err, code = service.PushDockerImage(image + ":" + tag)
+		code, err = service.PushDockerImage(image + ":" + tag)
 	} else {
-		err, code = service.PushK8SImage(image + ":" + tag)
+		code, err = service.PushK8SImage(image + ":" + tag)
 	}
 	if code == 0 {
 		r.Success(nil)

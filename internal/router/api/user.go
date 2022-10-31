@@ -53,7 +53,7 @@ func login(c *gin.Context) {
 		return
 	}
 	user := &base.DTOUser{}
-	err, code, token := service.Login(username, password, captcha, user)
+	code, token, err := service.Login(username, password, captcha, user)
 	if code == 0 {
 		r.Ctx.Header("Authorization", token)
 		r.Success(user)

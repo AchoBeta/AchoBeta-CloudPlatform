@@ -7,7 +7,6 @@ import (
 	"cloud-platform/internal/handle"
 	"cloud-platform/internal/router"
 	"cloud-platform/internal/service"
-
 	"fmt"
 
 	"github.com/gin-gonic/gin"
@@ -43,9 +42,9 @@ func createContainer(c *gin.Context) {
 	}
 	var code int8
 	if global.Config.App.Type == "docker" {
-		err, code = service.CreateDockerContainer(c.GetHeader("Authorization"), container, user.(*base.User))
+		code, err = service.CreateDockerContainer(c.GetHeader("Authorization"), container, user.(*base.User))
 	} else {
-		err, code = service.CreateK8SContainer(container)
+		code, err = service.CreateK8SContainer(container)
 	}
 	if code == 0 {
 		r.Success(nil)
@@ -66,8 +65,8 @@ func createContainer(c *gin.Context) {
 func getContainer(c *gin.Context) {
 	r := handle.NewResponse(c)
 	id := c.Param("id")
-	container := &cloud.Container{}
-	err, code := service.GetContainer(id, container)
+	container := &base.Container{}
+	code, err := service.GetContainer(id, container)
 	if code == 0 {
 		r.Success(container)
 	} else if code == 1 {
@@ -85,7 +84,7 @@ func getContainer(c *gin.Context) {
 func getContainers(c *gin.Context) {
 	r := handle.NewResponse(c)
 	user, _ := c.Get("user")
-	err, code, containers := service.GetContainers(user.(*base.User))
+	code, containers, err := service.GetContainers(user.(*base.User))
 	if code == 0 {
 		r.Success(containers)
 	} else if code == 1 {
@@ -105,9 +104,9 @@ func removeContainer(c *gin.Context) {
 	var err error
 	var code int8
 	if global.Config.App.Type == "docker" {
-		err, code = service.RemoveDockerContainer(c.GetHeader("Authorization"), id, user.(*base.User))
+		code, err = service.RemoveDockerContainer(c.GetHeader("Authorization"), id, user.(*base.User))
 	} else {
-		err, code = service.RemoveK8SContainer(id)
+		code, err = service.RemoveK8SContainer(id)
 	}
 	if code == 0 {
 		r.Success(nil)
@@ -130,9 +129,9 @@ func startContainer(c *gin.Context) {
 	var err error
 	var code int8
 	if global.Config.App.Type == "docker" {
-		err, code = service.StartDockerContainer(id)
+		code, err = service.StartDockerContainer(id)
 	} else {
-		err, code = service.StartK8SContainer(id)
+		code, err = service.StartK8SContainer(id)
 	}
 	if code == 0 {
 		r.Success(nil)
@@ -152,9 +151,9 @@ func stopContainer(c *gin.Context) {
 	var err error
 	var code int8
 	if global.Config.App.Type == "docker" {
-		err, code = service.StopDockerContainer(id)
+		code, err = service.StopDockerContainer(id)
 	} else {
-		err, code = service.StopK8SContainer(id)
+		code, err = service.StopK8SContainer(id)
 	}
 	if code == 0 {
 		r.Success(nil)
@@ -174,9 +173,9 @@ func restartContainer(c *gin.Context) {
 	var err error
 	var code int8
 	if global.Config.App.Type == "docker" {
-		err, code = service.RestartDockerContainer(id)
+		code, err = service.RestartDockerContainer(id)
 	} else {
-		err, code = service.RestartK8SContainer(id)
+		code, err = service.RestartK8SContainer(id)
 	}
 	if code == 0 {
 		r.Success(nil)
@@ -203,9 +202,9 @@ func makeImage(c *gin.Context) {
 	var err error
 	var code int8
 	if global.Config.App.Type == "docker" {
-		err, code = service.MakeDockerImage(id, image)
+		code, err = service.MakeDockerImage(id, image)
 	} else {
-		err, code = service.MakeK8SImage(id, image)
+		code, err = service.MakeK8SImage(id, image)
 	}
 	if code == 0 {
 		r.Success(nil)
@@ -226,9 +225,9 @@ func getContainerLog(c *gin.Context) {
 	var code int8
 	var out string
 	if global.Config.App.Type == "docker" {
-		err, code, out = service.GetDockerContainerLog(id)
+		code, out, err = service.GetDockerContainerLog(id)
 	} else {
-		err, code, out = service.GetK8SContainerLog(id)
+		code, out, err = service.GetK8SContainerLog(id)
 	}
 	if code == 0 {
 		r.Success(out)

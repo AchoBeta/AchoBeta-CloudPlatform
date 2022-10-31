@@ -17,45 +17,45 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func Login(username, password, captcha string, dtoUser *base.DTOUser) (error, int8, string) {
+func Login(username, password, captcha string, dtoUser *base.DTOUser) (int8, string, error) {
 	// 判断验证码是否正确
 	cmd := global.Rdb.Del(fmt.Sprintf(base.CAPTCHA, captcha))
 	if cmd.Err() != nil {
 		if cmd.Err() == redis.Nil {
-			return cmd.Err(), 1, ""
+			return 1, "", cmd.Err()
 		} else {
-			return cmd.Err(), 2, ""
+			return 2, "", cmd.Err()
 		}
 	}
 	// 判断数据库是否有此用户
 	filter := bson.M{"username": username}
 	res := global.GetMgoDb("abcp").Collection("user").FindOne(context.TODO(), filter)
 	if res.Err() != nil {
-		return res.Err(), 3, ""
+		return 3, "", res.Err()
 	}
 	var user base.User
 	err := res.Decode(&user)
 	if err != nil {
-		return err, 4, ""
+		return 4, "", err
 	}
 	// 验证密码是否正确
 	h := sha256.New()
 	h.Write([]byte(fmt.Sprintf("%s-%s", password, global.Config.App.Salt)))
 	if user.Password != fmt.Sprintf("%x", h.Sum(nil)) {
-		return err, 5, ""
+		return 5, "", err
 	}
 	token := createToken()
 	str, _ := commonx.StructToJson(&user)
 	cmd1 := global.Rdb.Set(context.TODO(), fmt.Sprintf(base.TOKEN, token), str, 30*time.Minute)
 	if cmd1.Err() != nil {
-		return cmd1.Err(), 6, ""
+		return 6, "", cmd1.Err()
 	}
 	dtoUser.Id = user.Id
 	dtoUser.Username = user.Username
 	dtoUser.Name = user.Name
 	dtoUser.Pow = user.Pow
 	dtoUser.Containers = user.Containers
-	return nil, 0, token
+	return 0, token, nil
 }
 
 func Register(username, name, password, againPassword, captcha string) (int8, error) {
