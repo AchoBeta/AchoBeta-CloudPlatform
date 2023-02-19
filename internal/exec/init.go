@@ -4,15 +4,11 @@ import (
 	"cloud-platform/global"
 	"cloud-platform/internal/base/cloud"
 	"cloud-platform/internal/base/config"
-	"cloud-platform/internal/base/constant"
 
 	"context"
 	"fmt"
 	"net/http"
 	"os"
-	"os/exec"
-	"regexp"
-	"strings"
 
 	"github.com/go-redis/redis"
 	"github.com/golang/glog"
@@ -118,28 +114,28 @@ func initBaseImage() {
 	if res.Err() != nil {
 		if res.Err() == mongo.ErrNoDocuments {
 			// 拉取远程镜像
-			glog.Infof("====== [cmd] pull base images ======")
-			_, err := exec.Command(constant.DOCKER, constant.IMAGE_PULL, imageName+":0.1").Output()
-			if err != nil {
-				glog.Errorf("[cmd] pull base images error ! msg: %s\n", err.Error())
-			}
-			out, err := exec.Command(base.DOCKER, base.IMAGES, imageName+":0.1").Output()
-			if err != nil {
-				glog.Errorf("[cmd] search base images error ! msg: %s\n", err.Error())
-				return
-			}
-			r := regexp.MustCompile(`[^\\s]+`)
-			ss := r.FindAllString(strings.Split(string(out), "\n")[1], -1)
+			// glog.Infof("====== [cmd] pull base images ======")
+			// _, err := exec.Command(base.DOCKER, base.IMAGE_PULL, imageName+":0.1").Output()
+			// if err != nil {
+			// 	glog.Errorf("[cmd] pull base images error ! msg: %s\n", err.Error())
+			// }
+			// out, err := exec.Command(base.DOCKER, base.IMAGES, imageName+":0.1").Output()
+			// if err != nil {
+			// 	glog.Errorf("[cmd] search base images error ! msg: %s\n", err.Error())
+			// 	return
+			// }
+			// r := regexp.MustCompile(`[^\\s]+`)
+			// ss := r.FindAllString(strings.Split(string(out), "\n")[1], -1)
 			image := base.Image{
-				Name:       ss[0],
-				Tag:        ss[1],
-				Id:         ss[2],
-				CreateTime: ss[3],
-				Size:       ss[4],
+				Name:       imageName,
+				Tag:        "0.1",
+				Id:         "",
+				CreateTime: "",
+				Size:       "",
 				Author:     "abcp",
 				Desc:       "base image; include ssh,scp; should bind port 22",
 			}
-			_, err = collection.InsertOne(context.TODO(), &image)
+			_, err := collection.InsertOne(context.TODO(), &image)
 			if err != nil {
 				glog.Errorf("[db] insert base images error ! msg: %s\n", err.Error())
 				return
