@@ -31,3 +31,12 @@ const (
 	// rmi my-hello-world:0.2
 	IMAGE_REMOVE string = "rmi"
 )
+
+const (
+	K8S        string = "kubectl"
+	K8S_RUN    string = "run"
+	K8S_EXPOST string = "expost"
+	K8S_GET    string = "get"
+	K8S_DELETE string = "delete"
+	K8S_LOG    string = "logs"
+)

@@ -112,7 +112,7 @@ func pushImage(c *gin.Context) {
 	tag := c.Param("tag")
 	var err error
 	var code int8
-	if global.Config.App.Type == "docker" {
+	if global.Config.App.Engine == "docker" {
 		code, err = service.PushDockerImage(image + ":" + tag)
 	} else {
 		code, err = service.PushK8SImage(image + ":" + tag)

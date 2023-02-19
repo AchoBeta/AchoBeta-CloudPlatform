@@ -53,7 +53,7 @@ func Upload(c *gin.Context) {
 	fileName := base64.StdEncoding.EncodeToString([]byte(name[0])) + name[1]
 	url, err := upload(fileName, file)
 	if err != nil {
-		glog.Errorf("file upload error! msg:", err.Error())
+		glog.Errorf("file upload error! msg: %v\n", err.Error())
 		r.Error(handle.INTERNAL_FILE_UPLOAD_ERROR)
 		return
 	}

@@ -22,14 +22,14 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-func Init(file string) {
+func Init(path string) {
 	// 日志启动要放在最开始
-	readConfig(file)
+	readConfig(path)
 	initMongo()
 	initRedis()
 	initMachineInfo()
 	initBaseImage()
-    global.HttpClient = http.DefaultClient
+	global.HttpClient = http.DefaultClient
 }
 
 func readConfig(file string) {
@@ -37,12 +37,12 @@ func readConfig(file string) {
 	global.Config = &config.Server{}
 	yamlFile, err := os.ReadFile(file)
 	if err != nil {
-		glog.Error(err.Error())
+		panic(err.Error())
 	}
 	//将配置文件读取到结构体中
 	err = yaml.Unmarshal(yamlFile, global.Config)
 	if err != nil {
-		glog.Error(err.Error())
+		panic(err.Error())
 	}
 }
 
@@ -58,14 +58,12 @@ func initMongo() {
 	// 连接到MongoDB
 	global.Mgo, err = mongo.Connect(context.TODO(), clientOptions)
 	if err != nil {
-		glog.Errorf("mongo connect error: %s", err)
-		return
+		panic(err.Error())
 	}
 	// 检查连接
 	err = global.Mgo.Ping(context.TODO(), nil)
 	if err != nil {
-		glog.Errorf("mongo ping error: %s", err)
-		return
+		panic(err.Error())
 	}
 	// 检查所需要的数据库是否存在
 
@@ -107,7 +105,7 @@ func initRedis() {
 
 	_, err := global.Rdb.Ping().Result()
 	if err != nil {
-		glog.Errorf("redis connect fail! message: %s\n", err.Error())
+		panic(err.Error())
 	}
 }
 
