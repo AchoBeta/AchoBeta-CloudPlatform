@@ -12,6 +12,7 @@ import (
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"golang.org/x/text/encoding/simplifiedchinese"
 )
 
 // 创建容器
@@ -188,18 +189,30 @@ func RestartDockerContainer(containerId string) (int8, error) {
 
 // 根据 Docker 容器制作镜像
 func MakeDockerImage(containerId string, image *base.Image) (int8, error) {
+	collection := global.GetMgoDb("abcp").Collection("image")
+	filter := bson.M{"name": image.Name, "tag": image.Tag}
+	res := collection.FindOne(context.TODO(), filter)
+	if res.Err() != nil && res.Err() != mongo.ErrNoDocuments {
+		return 2, res.Err()
+	} else if res.Err() == nil {
+		image1 := base.Image{}
+		res.Decode(&image1)
+		if !image1.IsDelete {
+			return 3, nil
+		}
+	}
 	out, err := exec.Command(base.DOCKER, base.CONTAINER_COMMIT, "-a", image.Author,
 		"-m", image.Desc, containerId, image.Name+":"+image.Tag).Output()
 	if err != nil {
 		return 1, err
 	}
 	image.Id = string(out[7:19])
-	collection := global.GetMgoDb("abcp").Collection("image")
+
 	_, err = collection.InsertOne(context.TODO(), image)
 	if err != nil {
 		return 2, err
 	}
-	return 3, nil
+	return 0, nil
 }
 
 // 根据 K8S 容器制作镜像
@@ -211,7 +224,9 @@ func MakeK8SImage(containerId string, image *base.Image) (int8, error) {
 func GetContainerLog(containerId string) (int8, string, error) {
 	var out []byte
 	var err error
+	fmt.Print(containerId)
 	if global.Config.App.Engine == "docker" {
+		// print(exec.Command(base.DOCKER, fmt.Sprintf("%s %s", base.CONTAINER_LOG, containerId)))
 		out, err = exec.Command(base.DOCKER, base.CONTAINER_LOG, containerId).Output()
 	} else {
 		out, err = exec.Command(base.DOCKER, base.K8S_LOG, containerId).Output()
@@ -219,6 +234,7 @@ func GetContainerLog(containerId string) (int8, string, error) {
 	if err != nil {
 		return 1, "", err
 	}
+	fmt.Print(simplifiedchinese.GBK.NewDecoder().Bytes(out))
 	return 0, string(out), nil
 }
 

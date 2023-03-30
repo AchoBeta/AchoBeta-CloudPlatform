@@ -9,6 +9,8 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"os/exec"
+	"strings"
 
 	"github.com/go-redis/redis"
 	"github.com/golang/glog"
@@ -108,34 +110,35 @@ func initRedis() {
 // 初始化基础镜像
 func initBaseImage() {
 	collection := global.GetMgoDb("abcp").Collection("image")
-	imageName := fmt.Sprintf("%s/abcp_base", global.Config.Docker.Hub.Host)
+	imageName := fmt.Sprintf("%s/abcp-base", global.Config.Docker.Hub.Host)
 	filter := bson.M{"name": imageName}
 	res := collection.FindOne(context.TODO(), filter)
+	// 拉取远程镜像
+	// glog.Infof("====== [cmd] pull base images ======")
+	// _, err := exec.Command(base.DOCKER, base.IMAGE_PULL, imageName+":0.2").Output()
+	// if err != nil {
+	// 	glog.Errorf("[cmd] pull base images error ! msg: %s\n", err.Error())
+	// }
 	if res.Err() != nil {
 		if res.Err() == mongo.ErrNoDocuments {
-			// 拉取远程镜像
-			// glog.Infof("====== [cmd] pull base images ======")
-			// _, err := exec.Command(base.DOCKER, base.IMAGE_PULL, imageName+":0.1").Output()
-			// if err != nil {
-			// 	glog.Errorf("[cmd] pull base images error ! msg: %s\n", err.Error())
-			// }
-			// out, err := exec.Command(base.DOCKER, base.IMAGES, imageName+":0.1").Output()
-			// if err != nil {
-			// 	glog.Errorf("[cmd] search base images error ! msg: %s\n", err.Error())
-			// 	return
-			// }
-			// r := regexp.MustCompile(`[^\\s]+`)
-			// ss := r.FindAllString(strings.Split(string(out), "\n")[1], -1)
+			out, err := exec.Command(base.DOCKER, base.IMAGES, imageName+":0.2").Output()
+			if err != nil {
+				glog.Errorf("[cmd] search base images error ! msg: %s\n", err.Error())
+				return
+			}
+			fmt.Print(string(out))
+			ss := strings.Split(string(out), "\n")
+			ss = strings.Split(ss[1], " ")
 			image := base.Image{
 				Name:       imageName,
-				Tag:        "0.1",
-				Id:         "",
+				Tag:        "0.2",
+				Id:         ss[10],
 				CreateTime: "",
 				Size:       "",
 				Author:     "abcp",
 				Desc:       "base image; include ssh,scp; should bind port 22",
 			}
-			_, err := collection.InsertOne(context.TODO(), &image)
+			_, err = collection.InsertOne(context.TODO(), &image)
 			if err != nil {
 				glog.Errorf("[db] insert base images error ! msg: %s\n", err.Error())
 				return

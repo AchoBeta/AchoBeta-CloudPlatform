@@ -189,6 +189,7 @@ func makeImage(c *gin.Context) {
 	} else {
 		code, err = service.MakeK8SImage(id, image)
 	}
+	fmt.Print(code)
 	if code == 0 {
 		r.Success(nil)
 	} else if code == 1 {
@@ -196,6 +197,9 @@ func makeImage(c *gin.Context) {
 		r.Error(handle.IMAGE_CREATE_FAIL)
 	} else if code == 2 {
 		glog.Errorf("[db] make image from container error ! msg: %s\n", err.Error())
+		r.Error(handle.IMAGE_CREATE_FAIL)
+	} else if code == 3 {
+		glog.Errorf("[cmd] make image fail, image has exist!")
 		r.Error(handle.IMAGE_CREATE_FAIL)
 	}
 }

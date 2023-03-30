@@ -54,7 +54,7 @@ func Listen() *gin.Engine {
 	/** 中间件部分 */
 	r.Use(gin.Logger())
 	r.Use(gin.Recovery())
-
+	r.Use(middleware.Cors())
 	/** 路由登记部分 */
 	// v0 模块, 无需权限校验
 	v0 := r.Group("/api")

@@ -6,7 +6,9 @@ import (
 	"cloud-platform/internal/base/config"
 	"cloud-platform/internal/handle"
 	commonx "cloud-platform/internal/pkg/common"
+	"context"
 	"fmt"
+	"net/http"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -14,6 +16,21 @@ import (
 
 	"github.com/golang/glog"
 )
+
+func Cors() gin.HandlerFunc {
+	return func(context *gin.Context) {
+		method := context.Request.Method
+		context.Header("Access-Control-Allow-Origin", "*")
+		context.Header("Access-Control-Allow-Headers", "Content-Type,AccessToken,X-CSRF-Token,Authorization,Token,x-token")
+		context.Header("Access-Control-Allow-Methods", "POST,GET,OPTIONS,DELETE,PATCH,PUT")
+		context.Header("Access-Control-Expose-Headers", "Content-Length,Access-Control-Allow-Origin,Access-Allow-Headers,Content-Type")
+		context.Header("Access-Control-Allow-Credentials", "true")
+		context.Header("Access-Control-Expose-Headers", "Authorization")
+		if method == "OPTIONS" {
+			context.AbortWithStatus(http.StatusNoContent)
+		}
+	}
+}
 
 func TokenVer() gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -40,12 +57,13 @@ func TokenVer() gin.HandlerFunc {
 		}
 		user := &base.User{}
 		commonx.JsonToStruct(cmd.Val(), user)
-		cmd1 := global.Rdb.Expire(fmt.Sprintf(base.TOKEN, token), 30*time.Minute)
+		cmd1 := global.Rdb.Expire(context.TODO(), fmt.Sprintf(base.TOKEN, token), 30*time.Minute)
 		if cmd1.Err() != nil {
 			glog.Errorf("token extension of time error ! msg: %s\n", cmd1.Err().Error())
 			c.Abort()
 			return
 		}
+		fmt.Print("abcd")
 		// 将 user 放到 context
 		c.Set("user", user)
 	}
@@ -53,7 +71,9 @@ func TokenVer() gin.HandlerFunc {
 
 func AdminVer() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		fmt.Print("1234")
 		user, _ := c.Get("user")
+		fmt.Print(user.(*base.User).Pow)
 		if user.(*base.User).Pow != config.ADMIN_POW {
 			r := handle.NewResponse(c)
 			r.Error(handle.INSUFFICENT_PERMISSIONS)
@@ -64,6 +84,7 @@ func AdminVer() gin.HandlerFunc {
 
 func ContainerVer() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		fmt.Print("abcd")
 		r := handle.NewResponse(c)
 		containerId := c.Param("id")
 		user, _ := c.Get("user")

@@ -51,7 +51,7 @@ func Login(username, password, captcha string, dtoUser *base.DTOUser) (int8, str
 	}
 	token := createToken()
 	str, _ := commonx.StructToJson(&user)
-	cmd1 := global.Rdb.Set(context.TODO(), fmt.Sprintf(base.TOKEN, token), str, 30*time.Minute)
+	cmd1 := global.Rdb.Set(context.TODO(), fmt.Sprintf(base.TOKEN, token), str, 30*time.Hour)
 	if cmd1.Err() != nil {
 		return 6, "", cmd1.Err()
 	}
@@ -59,6 +59,13 @@ func Login(username, password, captcha string, dtoUser *base.DTOUser) (int8, str
 	dtoUser.Username = user.Username
 	dtoUser.Name = user.Name
 	dtoUser.Pow = user.Pow
+	if user.Pow == config.ADMIN_POW {
+		dtoUser.Pow = "admin"
+	} else if user.Pow == config.USER_POW {
+		dtoUser.Pow = "user"
+	} else {
+		dtoUser.Pow = user.Pow
+	}
 	dtoUser.Containers = user.Containers
 	return 0, token, nil
 }
@@ -121,11 +128,17 @@ func GetUsers(user *base.DTOUser) (int8, []base.DTOUser, error) {
 		if err != nil {
 			return 2, nil, err
 		}
+		pow := "admin"
+		if user.Pow == config.USER_POW {
+			pow = "user"
+		} else if user.Pow == config.TOURIST_POW {
+			pow = user.Pow
+		}
 		dtoUser := base.DTOUser{
 			Id:         user.Id,
 			Username:   user.Username,
 			Name:       user.Name,
-			Pow:        user.Pow,
+			Pow:        pow,
 			Containers: user.Containers,
 		}
 		users = append(users, dtoUser)
