@@ -63,7 +63,6 @@ func TokenVer() gin.HandlerFunc {
 			c.Abort()
 			return
 		}
-		fmt.Print("abcd")
 		// 将 user 放到 context
 		c.Set("user", user)
 	}
@@ -71,7 +70,6 @@ func TokenVer() gin.HandlerFunc {
 
 func AdminVer() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		fmt.Print("1234")
 		user, _ := c.Get("user")
 		fmt.Print(user.(*base.User).Pow)
 		if user.(*base.User).Pow != config.ADMIN_POW {

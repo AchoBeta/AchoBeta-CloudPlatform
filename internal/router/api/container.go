@@ -33,8 +33,8 @@ func init() {
 // 创建容器
 func createContainer(c *gin.Context) {
 	r := handle.NewResponse(c)
-	container := &cloud.Container{}
-	err := c.BindJSON(&container)
+	container := &base.Container{}
+	err := c.ShouldBind(&container)
 	user, _ := c.Get("user")
 	if err != nil || container.Image == "" || container.Name == "" {
 		r.Error(handle.PARAM_NOT_VALID)
@@ -176,7 +176,7 @@ func makeImage(c *gin.Context) {
 	r := handle.NewResponse(c)
 	image := &cloud.Image{}
 	id := c.Param("id")
-	c.BindJSON(image)
+	c.ShouldBind(image)
 	image.Name = fmt.Sprintf("%s/%s", global.Config.App.Name, image.Name)
 	if id == "" || image.Name == "" || image.Desc == "" || image.Author == "" {
 		r.Error(handle.PARAM_NOT_COMPLETE)

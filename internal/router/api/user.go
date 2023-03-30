@@ -57,6 +57,7 @@ func login(c *gin.Context) {
 	user := &base.DTOUser{}
 	code, token, err := service.Login(username, password, captcha, user)
 	if code == 0 {
+		r.Ctx.Header("Access-Control-Expose-Headers", "Authorization")
 		r.Ctx.Header("Authorization", token)
 		r.Success(user)
 	} else if code == 1 {
@@ -140,7 +141,7 @@ func larkLogin(c *gin.Context) {
 func getUsers(c *gin.Context) {
 	r := handle.NewResponse(c)
 	user := &base.DTOUser{}
-	c.BindJSON(user)
+	c.ShouldBind(user)
 	code, users, err := service.GetUsers(user)
 	if code == 0 {
 		r.Success(users)
