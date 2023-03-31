@@ -173,14 +173,15 @@ func StopDockerContainer(containerId string) (int8, error) {
 
 // 重启 Docker 容器
 func RestartDockerContainer(containerId string) (int8, error) {
+	fmt.Println(containerId)
 	_, err := exec.Command(base.DOCKER, base.CONTAINER_RESTART, containerId).Output()
 	if err != nil {
 		return 1, err
 	}
 	collection := global.GetMgoDb("abcp").Collection("container")
-	filter := bson.M{"containerId": containerId}
-	update := bson.M{"$set": bson.M{"Status": 0}}
-	_, err = collection.UpdateOne(context.TODO(), filter, update)
+	// filter := bson.M{"containerId": containerId}
+	update := bson.M{"$set": bson.M{"status": 0}}
+	_, err = collection.UpdateByID(context.TODO(), containerId, update)
 	if err != nil {
 		return 2, err
 	}
