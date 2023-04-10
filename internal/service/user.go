@@ -58,14 +58,12 @@ func Login(username, password, captcha string, dtoUser *base.DTOUser) (int8, str
 	dtoUser.Id = user.Id
 	dtoUser.Username = user.Username
 	dtoUser.Name = user.Name
-	dtoUser.Pow = user.Pow
+	dtoUser.Pow = "tourist"
 	if user.Pow == config.ADMIN_POW {
 		dtoUser.Pow = "admin"
 	} else if user.Pow == config.USER_POW {
 		dtoUser.Pow = "user"
-	} else {
-		dtoUser.Pow = user.Pow
-	}
+	} 
 	dtoUser.Containers = user.Containers
 	return 0, token, nil
 }

@@ -2,8 +2,8 @@
 
 command=$1
 orginaze=achobeta
-name=abcp_webssh
-tag=0.1
+name=webssh
+tag=0.2
 port=8888
 
 # 启动 webssh

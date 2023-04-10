@@ -12,4 +12,4 @@ RUN chmod u+x $MYPATH/webssh.sh
 
 RUN $MYPATH/webssh.sh
 
-CMD nohup wssh --fbidhttp=False
+CMD nohup wssh --fbidhttp=False --xsrf=False
