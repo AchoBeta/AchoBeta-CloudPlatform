@@ -8,11 +8,10 @@ import (
 	commonx "CloudPlatform/pkg/common"
 	"context"
 	"fmt"
-	"time"
-
 	"github.com/gin-gonic/gin"
-	"github.com/go-redis/redis/v9"
 	"github.com/golang/glog"
+	"github.com/redis/go-redis/v9"
+	"time"
 )
 
 func TokenVer() gin.HandlerFunc {

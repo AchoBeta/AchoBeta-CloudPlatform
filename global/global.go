@@ -4,7 +4,7 @@ import (
 	"CloudPlatform/config"
 	"CloudPlatform/internal/base"
 
-	"github.com/go-redis/redis/v9"
+	"github.com/redis/go-redis/v9"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 

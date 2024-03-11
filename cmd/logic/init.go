@@ -6,17 +6,17 @@ import (
 	"CloudPlatform/internal/base"
 	"context"
 	"fmt"
+	"github.com/redis/go-redis/v9"
+	"gopkg.in/yaml.v3"
 	"os"
 	"os/exec"
 	"regexp"
 	"strings"
 
-	"github.com/go-redis/redis/v9"
 	"github.com/golang/glog"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"gopkg.in/yaml.v2"
 )
 
 func Init(file string) {

@@ -3,11 +3,9 @@ package redisx
 import (
 	commonx "CloudPlatform/pkg/common"
 	"context"
-	"time"
-
 	"github.com/mitchellh/mapstructure"
-
-	"github.com/go-redis/redis/v9"
+	"github.com/redis/go-redis/v9"
+	"time"
 )
 
 // SetStructToHash
