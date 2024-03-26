@@ -1,8 +1,8 @@
 package router
 
 import (
-	"CloudPlatform/global"
-	"CloudPlatform/internal/middleware"
+	"cloud-platform/global"
+	"cloud-platform/internal/middleware"
 	"fmt"
 
 	"github.com/gin-gonic/gin"

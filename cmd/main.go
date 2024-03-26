@@ -1,9 +1,7 @@
 package main
 
-import (
-	"CloudPlatform/cmd/logic"
-)
+import "cloud-platform/internal/exec"
 
 func main() {
-	logic.Run()
+	exec.Run()
 }

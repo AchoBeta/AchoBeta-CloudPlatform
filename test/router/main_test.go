@@ -1,16 +1,16 @@
 package router_test
 
 import (
-	"CloudPlatform/cmd/logic"
-	"CloudPlatform/config"
-	"CloudPlatform/global"
-	"CloudPlatform/internal/base"
-	"CloudPlatform/internal/router"
-	_ "CloudPlatform/internal/router/api"
-	commonx "CloudPlatform/pkg/common"
-	"context"
+	"cloud-platform/global"
+	"cloud-platform/internal/base"
+	"cloud-platform/internal/base/config"
+	"cloud-platform/internal/exec"
+	commonx "cloud-platform/internal/pkg/common"
+	"cloud-platform/internal/router"
+	_ "cloud-platform/internal/router/api"
 	"fmt"
 	"net/http"
+
 	"time"
 )
 
@@ -22,7 +22,7 @@ const (
 )
 
 func init() {
-	logic.Init("./test_config.yaml")
+	exec.Init("./test_config.yaml")
 	r = router.Listen()
 	setTokenToRedis()
 }
@@ -37,9 +37,9 @@ func setTokenToRedis() {
 		Pow:        config.ADMIN_POW,
 	}
 	str, _ := commonx.StuctToJson(user)
-	global.Rdb.Set(context.TODO(), fmt.Sprintf(base.TOKEN, token), str, 5*time.Minute)
+	global.Rdb.Set(fmt.Sprintf(base.TOKEN, token), str, 5*time.Minute)
 }
 
 func setCaptchaToRedis() {
-	global.Rdb.Set(context.TODO(), fmt.Sprintf(base.CAPTCHA, captcha), 1, 5*time.Minute)
+	global.Rdb.Set(fmt.Sprintf(base.CAPTCHA, captcha), 1, 5*time.Minute)
 }

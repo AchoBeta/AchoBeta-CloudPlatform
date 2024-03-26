@@ -1,10 +1,10 @@
 package service
 
 import (
-	"CloudPlatform/config"
-	"CloudPlatform/global"
-	"CloudPlatform/internal/base"
-	commonx "CloudPlatform/pkg/common"
+	"cloud-platform/global"
+	"cloud-platform/internal/base"
+	"cloud-platform/internal/base/config"
+	commonx "cloud-platform/internal/pkg/common"
 	"context"
 	"crypto/sha256"
 	"encoding/base64"
@@ -12,14 +12,14 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/go-redis/redis/v9"
+	"github.com/go-redis/redis"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
 func Login(username, password, captcha string, dtoUser *base.DTOUser) (error, int8, string) {
 	// 判断验证码是否正确
-	cmd := global.Rdb.Del(context.TODO(), fmt.Sprintf(base.CAPTCHA, captcha))
+	cmd := global.Rdb.Del(fmt.Sprintf(base.CAPTCHA, captcha))
 	if cmd.Err() != nil {
 		if cmd.Err() == redis.Nil {
 			return cmd.Err(), 1, ""
@@ -46,7 +46,7 @@ func Login(username, password, captcha string, dtoUser *base.DTOUser) (error, in
 	}
 	token := createToken()
 	str, _ := commonx.StuctToJson(user)
-	cmd1 := global.Rdb.Set(context.TODO(), fmt.Sprintf(base.TOKEN, token), str, 30*time.Minute)
+	cmd1 := global.Rdb.Set(fmt.Sprintf(base.TOKEN, token), str, 30*time.Minute)
 	if cmd1.Err() != nil {
 		return cmd1.Err(), 6, ""
 	}
@@ -58,21 +58,21 @@ func Login(username, password, captcha string, dtoUser *base.DTOUser) (error, in
 	return nil, 0, token
 }
 
-func Register(username, name, password, againPassword, captcha string) (error, int8) {
+func Register(username, name, password, againPassword, captcha string) (int8, error) {
 	// 判断验证码是否正确
-	cmd := global.Rdb.Del(context.TODO(), fmt.Sprintf(base.CAPTCHA, captcha))
+	cmd := global.Rdb.Del(fmt.Sprintf(base.CAPTCHA, captcha))
 	if cmd.Err() != nil {
 		if cmd.Err() == redis.Nil {
-			return cmd.Err(), 1
+			return 1, cmd.Err()
 		} else {
-			return cmd.Err(), 2
+			return 2, cmd.Err()
 		}
 	}
 	// 判断用户是否存在
 	filter := bson.M{"username": username}
 	res := global.GetMgoDb("abcp").Collection("user").FindOne(context.TODO(), filter)
 	if res.Err() != mongo.ErrNoDocuments {
-		return res.Err(), 3
+		return 3, res.Err()
 	}
 	// 添加数据
 	h := sha256.New()
@@ -87,9 +87,9 @@ func Register(username, name, password, againPassword, captcha string) (error, i
 	}
 	_, err := global.GetMgoDb("abcp").Collection("user").InsertOne(context.TODO(), &user)
 	if err != nil {
-		return err, 4
+		return 4, err
 	}
-	return nil, 0
+	return 0, nil
 }
 
 func createToken() string {
@@ -102,11 +102,11 @@ func createToken() string {
 	return base64.StdEncoding.EncodeToString(buf)
 }
 
-func GetUsers(user *base.DTOUser) (error, int8, []base.DTOUser) {
+func GetUsers(user *base.DTOUser) (int8, []base.DTOUser, error) {
 	collection := global.GetMgoDb("abcp").Collection("user")
 	cur, err := collection.Find(context.TODO(), user)
 	if err != nil {
-		return err, 1, nil
+		return 1, nil, err
 	}
 	defer cur.Close(context.TODO())
 	users := []base.DTOUser{}
@@ -114,7 +114,7 @@ func GetUsers(user *base.DTOUser) (error, int8, []base.DTOUser) {
 		user := base.User{}
 		err = cur.Decode(&user)
 		if err != nil {
-			return err, 2, nil
+			return 2, nil, err
 		}
 		dtoUser := base.DTOUser{
 			Id:         user.Id,
@@ -125,5 +125,5 @@ func GetUsers(user *base.DTOUser) (error, int8, []base.DTOUser) {
 		}
 		users = append(users, dtoUser)
 	}
-	return nil, 0, users
+	return 0, users, nil
 }

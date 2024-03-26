@@ -8,15 +8,15 @@ app:
 
 db:
   mongo:
-    address: 159.75.216.233
+    address: 1.12.44.120
     port: 27017
-    username: "root"
-    password: "123456"
+    username: "admin"
+    password: "admin"
     authSource: "admin"
   redis:
-    address: 159.75.216.233
+    address: 1.12.44.120
     port: 6379
-    password: 123456
+    password: 137248Csq!
     db: 3
   
 docker:

@@ -1,8 +1,9 @@
 package service
 
 import (
-	"CloudPlatform/global"
-	"CloudPlatform/internal/base"
+	"cloud-platform/global"
+	"cloud-platform/internal/base/cloud"
+	"cloud-platform/internal/base/constant"
 	"context"
 	"os/exec"
 
@@ -10,15 +11,15 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func GetImages() (error, int8, []base.Image) {
+func GetImages() (error, int8, []cloud.Image) {
 	collection := global.GetMgoDb("abcp").Collection("image")
 	cur, err := collection.Find(context.TODO(), bson.M{"isDelete": false})
 	if err != nil {
 		return err, 1, nil
 	}
-	images := []base.Image{}
+	images := []cloud.Image{}
 	for cur.Next(context.TODO()) {
-		image := base.Image{}
+		image := cloud.Image{}
 		err = cur.Decode(&image)
 		if err != nil {
 			return err, 2, nil
@@ -28,7 +29,7 @@ func GetImages() (error, int8, []base.Image) {
 	return nil, 0, images
 }
 
-func GetImageInfo(imageId string, image *base.Image) (error, int8) {
+func GetImageInfo(imageId string, image *cloud.Image) (error, int8) {
 	collection := global.GetMgoDb("abcp").Collection("image")
 	res := collection.FindOne(context.TODO(), bson.M{"_id": imageId})
 	if res.Err() != nil {
@@ -45,7 +46,7 @@ func GetImageInfo(imageId string, image *base.Image) (error, int8) {
 func DeleteImage(imageId string) (error, int8) {
 	// TODO: 删除数据库
 	collection := global.GetMgoDb("abcp").Collection("image")
-	update := bson.D{{"$set", bson.D{{"isDelete", "true"}}}}
+	update := bson.D{{Key: "$set", Value: bson.D{{Key: "isDelete", Value: "true"}}}}
 	_, err := collection.UpdateByID(context.TODO(), imageId, update)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
@@ -58,7 +59,7 @@ func DeleteImage(imageId string) (error, int8) {
 }
 
 func PushDockerImage(imageName string) (error, int8) {
-	_, err := exec.Command(base.DOCKER, base.IMAGE_PUSH, imageName).Output()
+	_, err := exec.Command(constant.DOCKER, constant.IMAGE_PUSH, imageName).Output()
 	if err != nil {
 		return err, 1
 	}

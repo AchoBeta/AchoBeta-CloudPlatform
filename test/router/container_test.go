@@ -1,19 +1,19 @@
 package router_test
 
 import (
-	"CloudPlatform/internal/base"
-	"CloudPlatform/internal/handle"
-	requestx "CloudPlatform/pkg/request"
+	"cloud-platform/internal/base/cloud"
+	"cloud-platform/internal/handle"
+	requestx "cloud-platform/internal/pkg/request"
 	"testing"
 )
 
 const containerId = "5ffcdf0c90fec7f75434b0d8084241577c38967a52af76362dfbd7c24124624d"
 
 func TestCreateContainer(t *testing.T) {
-	container := base.Container{
+	container := cloud.Container{
 		Name:  "base",
 		Image: "achobeta/abcp_base:0.1",
-		Param: base.Param{
+		Param: cloud.Param{
 			Ports: []int{18888},
 		},
 	}
@@ -121,7 +121,7 @@ func TestRemoveContainer(t *testing.T) {
 }
 
 func TestMakeImage(t *testing.T) {
-	image := base.Image{
+	image := cloud.Image{
 		Name:   "abcp/base1",
 		Tag:    "test",
 		Author: "marin",

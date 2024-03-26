@@ -1,7 +1,7 @@
 package router_test
 
 import (
-	"CloudPlatform/global"
+	"cloud-platform/global"
 	"context"
 	"testing"
 

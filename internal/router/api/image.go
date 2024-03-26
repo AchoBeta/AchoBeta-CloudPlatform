@@ -1,11 +1,11 @@
 package api
 
 import (
-	"CloudPlatform/global"
-	"CloudPlatform/internal/base"
-	"CloudPlatform/internal/handle"
-	"CloudPlatform/internal/router"
-	"CloudPlatform/internal/service"
+	"cloud-platform/global"
+	"cloud-platform/internal/base/cloud"
+	"cloud-platform/internal/handle"
+	"cloud-platform/internal/router"
+	"cloud-platform/internal/service"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang/glog"
@@ -44,7 +44,7 @@ func getImages(c *gin.Context) {
 func getImageInfo(c *gin.Context) {
 	r := handle.NewResponse(c)
 	id := c.Param("id")
-	image := &base.Image{}
+	image := &cloud.Image{}
 	err, code := service.GetImageInfo(id, image)
 	if code == 0 {
 		r.Success(image)
