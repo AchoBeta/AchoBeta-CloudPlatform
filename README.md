@@ -1,7 +1,7 @@
 # AchoBeta Cloud Platform
 
-`ABCP` 是 `AchoBeta` 自研的云平台，众所周知，无论是学习还是工作，一个 `Linux` 操作系统对一个程序员的成长来说是至关重要的。而我们搭建一个 `Linux` 环境一般有两种方式：搭建虚拟机、购买服务器。但是搭建一个虚拟机对一个编程小白来说无疑是十分复杂的，同时虚拟机还会受到主机性能的限制。而购买服务器虽然能快速搭建`Linux`系统，但是购买的服务器经常是吃灰状态。我们不能有效的利用，甚至榨干服务器，导致购买服务器对新手来说性价比很低。
-`ABCP`主要目的是在基于团队已有的服务器上，通过搭建一个虚拟云平台，让团队的成员可以随时创建出一台“真实”的服务器，以供学习和使用。
+`ABCP`全称`AchoBeta Cloud Platform`, 是`AchoBeta`开发的云平台，旨在简化`Linux`环境的搭建过程。
+通常搭建`Linux`有两种方法：搭建虚拟机和购买服务器。对编程新手而言，虚拟机设置复杂且受限于主机性能；而购买服务器虽快速但常常资源浪费，对新手来说性价比不高。`ABCP`通过在现有服务器上创建虚拟云平台，允许团队成员随时创建一台“真实”的服务器，用于学习和工作，从而更高效地利用资源。
 
 ## 项目架构
 ![](./docs/framework.png)
@@ -18,16 +18,33 @@
 ## 目录结构
 ```text
 AchoBeta-CloudPlatform 
-
-├─base   基础模块
-├─cmd    主要控制模块
-├─conf   配置文件
-├─docs   文档、图片等素材文件
-├─log    日志模块
-├─pkg    主要业务代码
-├─script 脚本文件
-├─test   测试模块
-├─util   配置模块
+.
+├── cmd main程序所在位置
+├── docs 文本文件
+├── global 全局控制, 如 DB
+├── internal 主要逻辑文件
+│   ├── base 实体
+│   │   ├── cloud
+│   │   ├── config
+│   │   └── constant
+│   ├── exec 启动逻辑
+│   ├── handle
+│   ├── middleware 中间件
+│   ├── pkg 公共模块
+│   │   ├── common
+│   │   ├── redis
+│   │   ├── request
+│   │   └── secret
+│   ├── router 路由, api 接口层
+│   │   └── api
+│   └── service 逻辑实现
+├── log 日志
+├── script 脚本
+│   ├── database
+│   └── webssh
+└── test 测试
+    ├── command
+    └── router
 ```
 
 
