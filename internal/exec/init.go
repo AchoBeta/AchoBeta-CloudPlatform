@@ -57,12 +57,42 @@ func initMongo() {
 	global.Mgo, err = mongo.Connect(context.TODO(), clientOptions)
 	if err != nil {
 		glog.Errorf("mongo connect error: %s", err)
+		return
 	}
 	// 检查连接
 	err = global.Mgo.Ping(context.TODO(), nil)
 	if err != nil {
 		glog.Errorf("mongo ping error: %s", err)
+		return
 	}
+	// 检查所需要的数据库是否存在
+
+	err = checkMongoDb()
+	if err != nil {
+		return
+	}
+}
+
+func checkMongoDb() error {
+	// 检查所需要的数据库是否存在
+	databases, err := global.Mgo.ListDatabaseNames(context.TODO(), bson.M{})
+	if err != nil {
+		glog.Errorf("mongo list databases error: %s", err)
+		return err
+	}
+	for _, db := range databases {
+		if db == "abcp" {
+			return err
+		}
+	}
+	glog.Errorf("Database 'abcp' does not exist")
+	// 或者创建数据库
+	_, err = global.Mgo.Database("abcp").Collection("image").InsertOne(context.TODO(), bson.M{})
+	if err != nil {
+		glog.Errorf("mongo create database error: %s", err)
+		return err
+	}
+	return nil
 }
 
 func initRedis() {
