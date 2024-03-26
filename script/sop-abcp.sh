@@ -7,6 +7,7 @@ updateAbcp() {
     fi
     startAbcp
 }
+
 startAbcp() {
     if [ ! -e "$cur/go.mod" ]; then
         echo "=====生成 go.mod====="
@@ -29,6 +30,7 @@ restartAbcp() {
     stopAbcp
     startAbcp
 }
+
 if [ $command == "start" ]; then
     startAbcp
 elif [ $command == "stop" ]; then
