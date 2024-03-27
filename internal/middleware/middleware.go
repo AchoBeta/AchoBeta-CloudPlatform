@@ -1,17 +1,17 @@
 package middleware
 
 import (
-	"CloudPlatform/config"
-	"CloudPlatform/global"
-	"CloudPlatform/internal/base"
-	"CloudPlatform/internal/handle"
-	commonx "CloudPlatform/pkg/common"
-	"context"
+	"cloud-platform/global"
+	"cloud-platform/internal/base"
+	"cloud-platform/internal/base/config"
+	"cloud-platform/internal/handle"
+	commonx "cloud-platform/internal/pkg/common"
 	"fmt"
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/go-redis/redis/v9"
+	"github.com/go-redis/redis"
+
 	"github.com/golang/glog"
 )
 
@@ -27,7 +27,7 @@ func TokenVer() gin.HandlerFunc {
 			return
 		}
 		/** 验证token是否合法与过期 */
-		cmd := global.Rdb.Get(context.TODO(), fmt.Sprintf(base.TOKEN, token))
+		cmd := global.Rdb.Get(fmt.Sprintf(base.TOKEN, token))
 		if cmd.Err() != nil {
 			if cmd.Err() == redis.Nil {
 				r.Error(handle.TOKEN_IS_EXPIRED)
@@ -40,7 +40,7 @@ func TokenVer() gin.HandlerFunc {
 		}
 		user := &base.User{}
 		commonx.JsonToStruct(cmd.Val(), user)
-		cmd1 := global.Rdb.Expire(context.TODO(), fmt.Sprintf(base.TOKEN, token), 30*time.Minute)
+		cmd1 := global.Rdb.Expire(fmt.Sprintf(base.TOKEN, token), 30*time.Minute)
 		if cmd1.Err() != nil {
 			glog.Errorf("token extension of time error ! msg: %s\n", cmd1.Err().Error())
 			c.Abort()

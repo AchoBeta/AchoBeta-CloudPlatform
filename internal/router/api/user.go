@@ -1,13 +1,12 @@
 package api
 
 import (
-	"CloudPlatform/global"
-	"CloudPlatform/internal/base"
-	"CloudPlatform/internal/handle"
-	"CloudPlatform/internal/router"
-	"CloudPlatform/internal/service"
 	"bytes"
-	"context"
+	"cloud-platform/global"
+	"cloud-platform/internal/base"
+	"cloud-platform/internal/handle"
+	"cloud-platform/internal/router"
+	"cloud-platform/internal/service"
 	"fmt"
 	"net/http"
 	"time"
@@ -36,7 +35,7 @@ func init() {
 func logout(c *gin.Context) {
 	token := c.GetHeader("Authorization")
 	r := handle.NewResponse(c)
-	_, err := global.Rdb.Del(context.TODO(), token).Result()
+	_, err := global.Rdb.Del(token).Result()
 	if err != nil {
 		r.Error(handle.INTERNAL_ERROR)
 	} else {
@@ -92,7 +91,7 @@ func register(c *gin.Context) {
 		r.Error(handle.USER_PASSWORD_DIFFERENT)
 		return
 	}
-	err, code := service.Register(username, name, password, againPassword, captcha)
+	code, err := service.Register(username, name, password, againPassword, captcha)
 	if code == 0 {
 		r.Success(nil)
 	} else if code == 1 {
@@ -112,7 +111,7 @@ func register(c *gin.Context) {
 func captcha1(c *gin.Context) {
 	w, h := 77, 36
 	captchaId := captcha.NewLen(4)
-	global.Rdb.Set(context.TODO(), fmt.Sprintf(base.CAPTCHA, captchaId), 1, 30*time.Minute)
+	global.Rdb.Set(fmt.Sprintf(base.CAPTCHA, captchaId), 1, 30*time.Minute)
 	err := writeResponse(c.Writer, c.Request, captchaId, ".png", "zh", false, w, h)
 	if err != nil {
 		glog.Errorf("create captcha error ! msg: %v\n", err.Error())
@@ -125,7 +124,7 @@ func getUsers(c *gin.Context) {
 	r := handle.NewResponse(c)
 	user := &base.DTOUser{}
 	c.BindJSON(user)
-	err, code, users := service.GetUsers(user)
+	code, users, err := service.GetUsers(user)
 	if code == 0 {
 		r.Success(users)
 	} else if code == 1 {

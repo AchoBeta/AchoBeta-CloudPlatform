@@ -1,8 +1,8 @@
 package requestx
 
 import (
-	"CloudPlatform/internal/handle"
 	"bytes"
+	"cloud-platform/internal/handle"
 	"encoding/json"
 	"errors"
 	"fmt"

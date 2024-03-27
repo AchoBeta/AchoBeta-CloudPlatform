@@ -1,4 +1,4 @@
-package base
+package cloud
 
 type Machine struct {
 	Id        string `bson:"_id"`

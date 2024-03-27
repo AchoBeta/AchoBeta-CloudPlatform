@@ -1,4 +1,4 @@
-package base
+package constant
 
 const (
 	DOCKER string = "docker"

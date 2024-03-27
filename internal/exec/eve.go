@@ -1,7 +1,7 @@
-package logic
+package exec
 
 import (
-	"CloudPlatform/global"
+	"cloud-platform/global"
 	"context"
 
 	"github.com/golang/glog"

@@ -1,8 +1,8 @@
-package logic
+package exec
 
 import (
-	"CloudPlatform/cmd/web"
-	_ "CloudPlatform/internal/router/api"
+	"cloud-platform/internal/router"
+	_ "cloud-platform/internal/router/api"
 	"flag"
 )
 
@@ -13,5 +13,5 @@ func Run() {
 	// 工程进入前夕，释放资源
 	defer Eve()
 	/** gin 启动要放在最后*/
-	web.Run()
+	router.Run()
 }

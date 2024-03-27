@@ -1,9 +1,11 @@
-package logic
+package exec
 
 import (
-	"CloudPlatform/config"
-	"CloudPlatform/global"
-	"CloudPlatform/internal/base"
+	"cloud-platform/global"
+	"cloud-platform/internal/base/cloud"
+	"cloud-platform/internal/base/config"
+	"cloud-platform/internal/base/constant"
+
 	"context"
 	"fmt"
 	"os"
@@ -11,7 +13,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/go-redis/redis/v9"
+	"github.com/go-redis/redis"
 	"github.com/golang/glog"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -33,12 +35,12 @@ func readConfig(file string) {
 	global.Config = &config.Server{}
 	yamlFile, err := os.ReadFile(file)
 	if err != nil {
-		fmt.Println(err.Error())
+		glog.Error(err.Error())
 	}
 	//将配置文件读取到结构体中
 	err = yaml.Unmarshal(yamlFile, global.Config)
 	if err != nil {
-		fmt.Println(err.Error())
+		glog.Error(err.Error())
 	}
 }
 
@@ -55,12 +57,42 @@ func initMongo() {
 	global.Mgo, err = mongo.Connect(context.TODO(), clientOptions)
 	if err != nil {
 		glog.Errorf("mongo connect error: %s", err)
+		return
 	}
 	// 检查连接
 	err = global.Mgo.Ping(context.TODO(), nil)
 	if err != nil {
 		glog.Errorf("mongo ping error: %s", err)
+		return
 	}
+	// 检查所需要的数据库是否存在
+
+	err = checkMongoDb()
+	if err != nil {
+		return
+	}
+}
+
+func checkMongoDb() error {
+	// 检查所需要的数据库是否存在
+	databases, err := global.Mgo.ListDatabaseNames(context.TODO(), bson.M{})
+	if err != nil {
+		glog.Errorf("mongo list databases error: %s", err)
+		return err
+	}
+	for _, db := range databases {
+		if db == "abcp" {
+			return err
+		}
+	}
+	glog.Errorf("Database 'abcp' does not exist")
+	// 或者创建数据库
+	_, err = global.Mgo.Database("abcp").Collection("image").InsertOne(context.TODO(), bson.M{})
+	if err != nil {
+		glog.Errorf("mongo create database error: %s", err)
+		return err
+	}
+	return nil
 }
 
 func initRedis() {
@@ -71,7 +103,7 @@ func initRedis() {
 		DB:       global.Config.Db.Redis.Db,
 	})
 
-	_, err := global.Rdb.Ping(context.TODO()).Result()
+	_, err := global.Rdb.Ping().Result()
 	if err != nil {
 		glog.Errorf("redis connect fail! message: %s\n", err.Error())
 	}
@@ -81,25 +113,25 @@ func initRedis() {
 func initBaseImage() {
 	collection := global.GetMgoDb("abcp").Collection("image")
 	imageName := fmt.Sprintf("%s/abcp_base", global.Config.Docker.Hub.Host)
-	filter := bson.D{{"name", imageName}}
+	filter := bson.D{{Key: "name", Value: imageName}}
 	res := collection.FindOne(context.TODO(), filter)
 	if res.Err() != nil {
 		if res.Err() == mongo.ErrNoDocuments {
 			// 拉取远程镜像
 			glog.Infof("====== [cmd] pull base images ======")
-			_, err := exec.Command(base.DOCKER, base.IMAGE_PULL, imageName+":0.1").Output()
+			_, err := exec.Command(constant.DOCKER, constant.IMAGE_PULL, imageName+":0.1").Output()
 			if err != nil {
 				glog.Errorf("[cmd] pull base images error ! msg: %s\n", err.Error())
 			}
-			out, err := exec.Command(base.DOCKER, base.IMAGES, imageName+"0.1").Output()
+			out, err := exec.Command(constant.DOCKER, constant.IMAGES, imageName+"0.1").Output()
 			if err != nil {
 				glog.Errorf("[cmd] search base images error ! msg: %s\n", err.Error())
 				return
 			}
-			r := regexp.MustCompile("[^\\s]+")
+			r := regexp.MustCompile(`[^\\s]+`)
 			ss := r.FindAllString(strings.Split(string(out), "\n")[1], -1)
 			fmt.Print(ss)
-			image := base.Image{
+			image := cloud.Image{
 				Name:       ss[0],
 				Tag:        ss[1],
 				Id:         ss[2],
@@ -123,9 +155,9 @@ func initBaseImage() {
 func initMachineInfo() {
 	// 从数据库读取
 	collection := global.GetMgoDb("abcp").Collection("machine")
-	filter := bson.D{{"_id", "1"}}
+	filter := bson.D{{Key: "_id", Value: "1"}}
 	res := collection.FindOne(context.TODO(), filter)
-	global.Machine = &base.Machine{}
+	global.Machine = &cloud.Machine{}
 	if res.Err() != nil {
 		if res.Err() == mongo.ErrNoDocuments {
 			// 初始化本机信息

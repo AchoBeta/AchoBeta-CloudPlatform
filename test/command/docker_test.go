@@ -1,7 +1,7 @@
 package command_test
 
 import (
-	"CloudPlatform/internal/base"
+	"cloud-platform/internal/base/constant"
 	"fmt"
 	"os/exec"
 	"strings"
@@ -9,7 +9,7 @@ import (
 )
 
 func TestGetImages(t *testing.T) {
-	out, err := executor(base.DOCKER, base.IMAGES, "hello-world:latest")
+	out, err := executor(constant.DOCKER, constant.IMAGES, "hello-world:latest")
 	if err != nil {
 		t.Error(err)
 	}
@@ -27,7 +27,7 @@ func TestGetImages(t *testing.T) {
 }
 
 func TestSearchImages(t *testing.T) {
-	out, err := executor(base.DOCKER, base.IMAGE_SEARCH, "hello-world")
+	out, err := executor(constant.DOCKER, constant.IMAGE_SEARCH, "hello-world")
 	if err != nil {
 		t.Error(err)
 	}
@@ -42,8 +42,8 @@ func TestSearchImages(t *testing.T) {
 }
 
 func TestBuildImageByDockerfile(t *testing.T) {
-	cmd := fmt.Sprintf(base.IMAGE_BUILD, "./TestDockerfile", "my-image:test")
-	out, err := executor(base.DOCKER, cmd)
+	cmd := fmt.Sprintf(constant.IMAGE_BUILD, "./TestDockerfile", "my-image:test")
+	out, err := executor(constant.DOCKER, cmd)
 	if err != nil {
 		t.Error(err)
 	}
@@ -51,8 +51,8 @@ func TestBuildImageByDockerfile(t *testing.T) {
 }
 
 func TestRemoveImage(t *testing.T) {
-	cmd := fmt.Sprintf(base.IMAGE_REMOVE, "my-image:test")
-	out, err := executor(base.DOCKER, cmd)
+	cmd := fmt.Sprintf(constant.IMAGE_REMOVE, "my-image:test")
+	out, err := executor(constant.DOCKER, cmd)
 	if err != nil {
 		t.Error(err)
 		return
@@ -65,8 +65,8 @@ func TestRemoveImage(t *testing.T) {
 }
 
 func TestPullImage(t *testing.T) {
-	cmd := fmt.Sprintf(base.IMAGE_PULL, "hello-world:latest")
-	out, err := executor(base.DOCKER, cmd)
+	cmd := fmt.Sprintf(constant.IMAGE_PULL, "hello-world:latest")
+	out, err := executor(constant.DOCKER, cmd)
 	if err != nil {
 		t.Error(err)
 	}
@@ -75,8 +75,8 @@ func TestPullImage(t *testing.T) {
 
 // 案例会不通过
 func TestPushImage(t *testing.T) {
-	cmd := fmt.Sprintf(base.IMAGE_PUSH, "hello-world", "latest")
-	out, err := executor(base.DOCKER, cmd)
+	cmd := fmt.Sprintf(constant.IMAGE_PUSH, "hello-world", "latest")
+	out, err := executor(constant.DOCKER, cmd)
 	if err != nil {
 		fmt.Println(string(out))
 		t.Error(err)
@@ -85,8 +85,8 @@ func TestPushImage(t *testing.T) {
 }
 
 func TestCreateContainer(t *testing.T) {
-	cmd := fmt.Sprintf(base.CONTAINER_RUN, "--name hello-world hello-world:latest")
-	out, err := executor(base.DOCKER, cmd)
+	cmd := fmt.Sprintf(constant.CONTAINER_RUN, "--name hello-world hello-world:latest")
+	out, err := executor(constant.DOCKER, cmd)
 	if err != nil {
 		fmt.Println(string(out))
 		t.Error(err)
@@ -99,8 +99,8 @@ func TestCreateContainer(t *testing.T) {
 
 // 一般查容器是通过数据库，而不会通过 docker ps -a
 func TestGetContainers(t *testing.T) {
-	cmd := fmt.Sprintf(base.CONTAINER_PS_ALL)
-	out, err := executor(base.DOCKER, cmd)
+	cmd := fmt.Sprintf(constant.CONTAINER_PS_ALL)
+	out, err := executor(constant.DOCKER, cmd)
 	if err != nil {
 		t.Error(err)
 	}
@@ -115,8 +115,8 @@ func TestGetContainers(t *testing.T) {
 }
 
 func TestContainerStart(t *testing.T) {
-	cmd := fmt.Sprintf(base.CONTAINER_START, "hello-world")
-	out, err := executor(base.DOCKER, cmd)
+	cmd := fmt.Sprintf(constant.CONTAINER_START, "hello-world")
+	out, err := executor(constant.DOCKER, cmd)
 	if err != nil {
 		t.Error(err)
 	}
@@ -127,8 +127,8 @@ func TestContainerStart(t *testing.T) {
 }
 
 func TestContainerStop(t *testing.T) {
-	cmd := fmt.Sprintf(base.CONTAINER_STOP, "hello-world")
-	out, err := executor(base.DOCKER, cmd)
+	cmd := fmt.Sprintf(constant.CONTAINER_STOP, "hello-world")
+	out, err := executor(constant.DOCKER, cmd)
 	if err != nil {
 		t.Error(err)
 	}
@@ -139,8 +139,8 @@ func TestContainerStop(t *testing.T) {
 }
 
 func TestContainerRestart(t *testing.T) {
-	cmd := fmt.Sprintf(base.CONTAINER_RESTART, "hello-world")
-	out, err := executor(base.DOCKER, cmd)
+	cmd := fmt.Sprintf(constant.CONTAINER_RESTART, "hello-world")
+	out, err := executor(constant.DOCKER, cmd)
 	if err != nil {
 		t.Error(err)
 	}
@@ -151,8 +151,8 @@ func TestContainerRestart(t *testing.T) {
 }
 
 func TestMakeImageByContainer(t *testing.T) {
-	cmd := fmt.Sprintf(base.CONTAINER_COMMIT, "慢慢", "测试", "hello-world", "my-test", "0.1")
-	out, err := executor(base.DOCKER, cmd)
+	cmd := fmt.Sprintf(constant.CONTAINER_COMMIT, "慢慢", "测试", "hello-world", "my-test", "0.1")
+	out, err := executor(constant.DOCKER, cmd)
 	if err != nil {
 		t.Log(err)
 		return
@@ -164,8 +164,8 @@ func TestMakeImageByContainer(t *testing.T) {
 }
 
 func TestRemoveContainer(t *testing.T) {
-	cmd := fmt.Sprintf(base.CONTAINER_RM, "hello-world")
-	out, err := executor(base.DOCKER, cmd)
+	cmd := fmt.Sprintf(constant.CONTAINER_RM, "hello-world")
+	out, err := executor(constant.DOCKER, cmd)
 	if err != nil {
 		t.Error(err)
 	}

@@ -1,11 +1,13 @@
 package api
 
 import (
-	"CloudPlatform/global"
-	"CloudPlatform/internal/base"
-	"CloudPlatform/internal/handle"
-	"CloudPlatform/internal/router"
-	"CloudPlatform/internal/service"
+	"cloud-platform/global"
+	"cloud-platform/internal/base"
+	"cloud-platform/internal/base/cloud"
+	"cloud-platform/internal/handle"
+	"cloud-platform/internal/router"
+	"cloud-platform/internal/service"
+
 	"fmt"
 
 	"github.com/gin-gonic/gin"
@@ -32,7 +34,7 @@ func init() {
 // 创建容器
 func createContainer(c *gin.Context) {
 	r := handle.NewResponse(c)
-	container := &base.Container{}
+	container := &cloud.Container{}
 	err := c.BindJSON(&container)
 	user, _ := c.Get("user")
 	if err != nil || container.Image == "" || container.Name == "" {
@@ -64,7 +66,7 @@ func createContainer(c *gin.Context) {
 func getContainer(c *gin.Context) {
 	r := handle.NewResponse(c)
 	id := c.Param("id")
-	container := &base.Container{}
+	container := &cloud.Container{}
 	err, code := service.GetContainer(id, container)
 	if code == 0 {
 		r.Success(container)
@@ -190,7 +192,7 @@ func restartContainer(c *gin.Context) {
 // 根据容器制作镜像
 func makeImage(c *gin.Context) {
 	r := handle.NewResponse(c)
-	image := &base.Image{}
+	image := &cloud.Image{}
 	id := c.Param("id")
 	c.BindJSON(image)
 	image.Name = fmt.Sprintf("%s/%s", global.Config.App.Name, image.Name)

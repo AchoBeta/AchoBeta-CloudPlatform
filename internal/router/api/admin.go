@@ -1,11 +1,11 @@
 package api
 
 import (
-	"CloudPlatform/config"
-	"CloudPlatform/global"
-	"CloudPlatform/internal/base"
-	"CloudPlatform/internal/handle"
-	"CloudPlatform/internal/router"
+	"cloud-platform/global"
+	"cloud-platform/internal/base"
+	"cloud-platform/internal/base/config"
+	"cloud-platform/internal/handle"
+	"cloud-platform/internal/router"
 	"context"
 
 	"github.com/gin-gonic/gin"

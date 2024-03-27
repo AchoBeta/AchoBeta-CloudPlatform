@@ -1,8 +1,8 @@
 package api
 
 import (
-	"CloudPlatform/internal/handle"
-	"CloudPlatform/internal/router"
+	"cloud-platform/internal/handle"
+	"cloud-platform/internal/router"
 	"context"
 	"encoding/base64"
 	"fmt"

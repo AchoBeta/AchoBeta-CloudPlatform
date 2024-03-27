@@ -1,4 +1,4 @@
-package base
+package cloud
 
 type Image struct {
 	Id         string `bson:"_id"`

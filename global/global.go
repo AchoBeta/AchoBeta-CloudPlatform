@@ -1,16 +1,16 @@
 package global
 
 import (
-	"CloudPlatform/config"
-	"CloudPlatform/internal/base"
+	"cloud-platform/internal/base/cloud"
+	"cloud-platform/internal/base/config"
 
-	"github.com/go-redis/redis/v9"
+	"github.com/go-redis/redis"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
 var (
 	Config  *config.Server
-	Machine *base.Machine
+	Machine *cloud.Machine
 	Mgo     *mongo.Client
 	Rdb     *redis.Client
 )
