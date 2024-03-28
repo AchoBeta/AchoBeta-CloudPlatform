@@ -1,46 +1,57 @@
-package exec
+package load
 
 import (
 	"cloud-platform/global"
 	"cloud-platform/internal/base/cloud"
 	"cloud-platform/internal/base/config"
 	"cloud-platform/internal/base/constant"
+	"flag"
 
 	"context"
 	"fmt"
-	"os"
 	"os/exec"
 	"regexp"
 	"strings"
 
 	"github.com/go-redis/redis"
 	"github.com/golang/glog"
+	"github.com/spf13/viper"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"gopkg.in/yaml.v2"
 )
 
-func Init(file string) {
+const FILE_PATH = "./config.yaml"
+
+func Init() {
 	// 日志启动要放在最开始
-	readConfig(file)
+	readConfig()
+	initLog()
 	initMongo()
 	initRedis()
 	initMachineInfo()
 	initBaseImage()
 }
 
-func readConfig(file string) {
+func initLog() {
+	logFilePath := flag.String("l", global.Config.Options.LogFilePath, "log file path")
+	flag.Parse()
+	InitLog(*logFilePath)
+	defer Sync()
+}
+
+func readConfig() {
 	//导入配置文件
 	global.Config = &config.Server{}
-	yamlFile, err := os.ReadFile(file)
+	viper.SetConfigFile(FILE_PATH)
+	err := viper.ReadInConfig()
 	if err != nil {
-		glog.Error(err.Error())
+		panic(err.Error())
 	}
 	//将配置文件读取到结构体中
-	err = yaml.Unmarshal(yamlFile, global.Config)
+	err = viper.Unmarshal(global.Config)
 	if err != nil {
-		glog.Error(err.Error())
+		panic(err.Error())
 	}
 }
 

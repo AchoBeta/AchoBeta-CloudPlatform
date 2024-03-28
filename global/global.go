@@ -6,9 +6,11 @@ import (
 
 	"github.com/go-redis/redis"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.uber.org/zap"
 )
 
 var (
+	Logger  *zap.SugaredLogger
 	Config  *config.Server
 	Machine *cloud.Machine
 	Mgo     *mongo.Client
