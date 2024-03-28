@@ -5,6 +5,7 @@ import (
 	"cloud-platform/internal/middleware"
 	"fmt"
 
+	"github.com/gin-gonic/gin"
 	"github.com/golang/glog"
 )
 

@@ -4,7 +4,8 @@ import (
 	"cloud-platform/global"
 	"cloud-platform/internal/base"
 	"cloud-platform/internal/base/config"
-	"cloud-platform/internal/exec"
+	"cloud-platform/pkg/load"
+
 	commonx "cloud-platform/internal/pkg/common"
 	"cloud-platform/internal/router"
 	_ "cloud-platform/internal/router/api"
@@ -22,7 +23,7 @@ const (
 )
 
 func init() {
-	exec.Init("./test_config.yaml")
+	load.Init()
 	r = router.Listen()
 	setTokenToRedis()
 }
