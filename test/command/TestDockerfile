@@ -1,5 +1,0 @@
-FROM hello-world
-MAINTAINER 	marin<marin_man@163.com>
-
-ENV MYPATH /usr/local
-WORKDIR $MYPATH
