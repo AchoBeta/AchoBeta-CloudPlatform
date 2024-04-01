@@ -21,6 +21,8 @@ type Route struct {
 }
 
 const (
+	// 路由级别, 规定数字越大级别越高
+	// 在某种情况下, 高级别的路由会适用于低级别的路由
 	LEVEL_GLOBAL RouteLevel = 0 // 匿名级别路由
 	LEVEL_V1     RouteLevel = 1
 	LEVEL_V2     RouteLevel = 2
@@ -70,7 +72,18 @@ func (rm *RouteManager) RegisterRouter(level RouteLevel, router PathHandler) {
 	rm.Routes[level].Path = append(rm.Routes[level].Path, router)
 }
 
-func (rm *RouteManager) RegisterMiddleware(level RouteLevel, middleware Middleware) {
+// @title RegisterMiddleware
+// @description 注册中间件
+// @param level RouteLevel 路由级别
+// @param middleware Middleware 中间件
+// @param iteration bool 是否迭代, 即 v3 等级的中间件会同时注册到 v2, v1, v0 等级 (向下兼容)
+func (rm *RouteManager) RegisterMiddleware(level RouteLevel, middleware Middleware, iteration bool) {
 	rm.checkRoute(level)
+	if iteration {
+		for lvl := level; lvl >= 0; lvl-- {
+			rm.Routes[lvl].Middlewares = append(rm.Routes[lvl].Middlewares, middleware)
+		}
+		return
+	}
 	rm.Routes[level].Middlewares = append(rm.Routes[level].Middlewares, middleware)
 }
