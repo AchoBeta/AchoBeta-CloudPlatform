@@ -12,8 +12,8 @@ db:
   mongo:
     address: 
     port: 
-    password: 
     username: 
+    password: 
     authSource: 
   redis:
     address: 

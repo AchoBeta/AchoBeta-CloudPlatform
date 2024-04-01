@@ -10,9 +10,9 @@ import (
 )
 
 func init() {
-	RegisterRouter(func(r *route.RouterGroup) {
+	RouteHandler.RegisterRouter(LEVEL_GLOBAL, func(r *route.RouterGroup) {
 		r.GET("/test", Test)
-	}, LEVEL_GLOBAL)
+	})
 }
 
 func Test(ctx context.Context, c *app.RequestContext) {

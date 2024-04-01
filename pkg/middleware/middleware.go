@@ -8,8 +8,9 @@ import (
 	"cloud-platform/pkg/handle"
 	"context"
 	"fmt"
-	"github.com/cloudwego/hertz/pkg/app"
 	"time"
+
+	"github.com/cloudwego/hertz/pkg/app"
 
 	"github.com/go-redis/redis"
 
