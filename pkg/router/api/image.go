@@ -2,30 +2,33 @@ package api
 
 import (
 	"cloud-platform/global"
-	"cloud-platform/internal/base/cloud"
-	"cloud-platform/internal/handle"
-	"cloud-platform/internal/router"
-	"cloud-platform/internal/service"
 
-	"github.com/gin-gonic/gin"
+	"cloud-platform/pkg/base/cloud"
+	"cloud-platform/pkg/handle"
+	"cloud-platform/pkg/router/manager"
+	"cloud-platform/pkg/service"
+	"context"
+
+	"github.com/cloudwego/hertz/pkg/app"
+	"github.com/cloudwego/hertz/pkg/route"
 	"github.com/golang/glog"
 )
 
 func init() {
-	router.Register(func(router gin.IRoutes) {
+	manager.RouteHandler.RegisterRouter(manager.LEVEL_V1, func(router *route.RouterGroup) {
 		router.GET("/images", getImages)
 		router.GET("/images/:id", getImageInfo)
 		//router.POST("/images/:id/build", buildImage)
 		//router.GET("/images/search", searchImages)
 		router.GET("/images/:id/push", pushImage)
-	}, router.V1)
-	router.Register(func(router gin.IRoutes) {
+	})
+	manager.RouteHandler.RegisterRouter(manager.LEVEL_V2, func(router *route.RouterGroup) {
 		router.DELETE("/images/:id", deleteImage)
-	}, router.V2)
+	})
 }
 
 // 获取本地所有镜像
-func getImages(c *gin.Context) {
+func getImages(ctx context.Context, c *app.RequestContext) {
 	// TODO: 查数据库
 	r := handle.NewResponse(c)
 	err, code, images := service.GetImages()
@@ -41,7 +44,7 @@ func getImages(c *gin.Context) {
 }
 
 // 根据 id 获取镜像信息
-func getImageInfo(c *gin.Context) {
+func getImageInfo(ctx context.Context, c *app.RequestContext) {
 	r := handle.NewResponse(c)
 	id := c.Param("id")
 	image := &cloud.Image{}
@@ -57,7 +60,7 @@ func getImageInfo(c *gin.Context) {
 }
 
 // 通过上传 Dockerfile 制作镜像
-// func buildImage(c *gin.Context) {
+// func buildImage(ctx context.Context, c *app.RequestContext) {
 // 	r := handle.NewResponse(c)
 // 	imageName := c.BindQuery("image-name")
 // 	// TODO: 上传文件并保存到 `/docker/` 目录
@@ -73,7 +76,7 @@ func getImageInfo(c *gin.Context) {
 // }
 
 // 删除镜像（逻辑删除）
-func deleteImage(c *gin.Context) {
+func deleteImage(ctx context.Context, c *app.RequestContext) {
 	r := handle.NewResponse(c)
 	id := c.Param("id")
 	err, code := service.DeleteImage(id)
@@ -88,7 +91,7 @@ func deleteImage(c *gin.Context) {
 }
 
 // 在 DockerHub 搜索镜像
-// func searchImages(c *gin.Context) {
+// func searchImages(ctx context.Context, c *app.RequestContext) {
 // 	r := handle.NewResponse(c)
 // 	image := c.Param("image")
 // 	tag := c.Param("tag")
@@ -107,7 +110,7 @@ func deleteImage(c *gin.Context) {
 // }
 
 // TODO: 上传镜像到 DockerHub
-func pushImage(c *gin.Context) {
+func pushImage(ctx context.Context, c *app.RequestContext) {
 	r := handle.NewResponse(c)
 	image := c.Param("image")
 	tag := c.Param("tag")

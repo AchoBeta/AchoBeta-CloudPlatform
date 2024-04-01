@@ -2,7 +2,7 @@ package requestx
 
 import (
 	"bytes"
-	"cloud-platform/internal/handle"
+	"cloud-platform/pkg/handle"
 	"encoding/json"
 	"errors"
 	"fmt"

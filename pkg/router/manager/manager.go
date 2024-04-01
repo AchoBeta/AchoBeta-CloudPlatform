@@ -1,6 +1,7 @@
-package router
+package manager
 
 import (
+	"cloud-platform/global"
 	"fmt"
 
 	"github.com/cloudwego/hertz/pkg/app"
@@ -54,17 +55,21 @@ func (rm *RouteManager) checkRoute(level RouteLevel) {
 }
 
 func (rm *RouteManager) Register(h *server.Hertz) {
+	routeCount, middlewareCount := 0, 0
 	for _, route := range rm.Routes {
 		v := h.Group(route.Url)
 		// 中间件注册
 		for _, middleware := range route.Middlewares {
+			middlewareCount++
 			v.Use(middleware())
 		}
 		// 路由注册
 		for _, router := range route.Path {
+			routeCount++
 			router(v)
 		}
 	}
+	global.Logger.Infof("Registering routes, total routes: %d, total middlewares: %d", routeCount, middlewareCount)
 }
 
 func (rm *RouteManager) RegisterRouter(level RouteLevel, router PathHandler) {
@@ -80,8 +85,8 @@ func (rm *RouteManager) RegisterRouter(level RouteLevel, router PathHandler) {
 func (rm *RouteManager) RegisterMiddleware(level RouteLevel, middleware Middleware, iteration bool) {
 	rm.checkRoute(level)
 	if iteration {
-		for lvl := level; lvl >= 0; lvl-- {
-			rm.Routes[lvl].Middlewares = append(rm.Routes[lvl].Middlewares, middleware)
+		for e := level; e >= 0; e-- {
+			rm.Routes[e].Middlewares = append(rm.Routes[e].Middlewares, middleware)
 		}
 		return
 	}

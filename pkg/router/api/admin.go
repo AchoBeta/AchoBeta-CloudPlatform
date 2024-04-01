@@ -2,26 +2,27 @@ package api
 
 import (
 	"cloud-platform/global"
-	"cloud-platform/internal/base"
-	"cloud-platform/internal/base/config"
-	"cloud-platform/internal/handle"
-	"cloud-platform/internal/router"
+	"cloud-platform/pkg/base"
+	"cloud-platform/pkg/base/config"
+	"cloud-platform/pkg/handle"
+	"cloud-platform/pkg/router/manager"
 	"context"
 
-	"github.com/gin-gonic/gin"
+	"github.com/cloudwego/hertz/pkg/app"
+	"github.com/cloudwego/hertz/pkg/route"
 	"github.com/golang/glog"
 	"go.mongodb.org/mongo-driver/bson"
 )
 
 func init() {
-	router.Register(func(router gin.IRoutes) {
+	manager.RouteHandler.RegisterRouter(manager.LEVEL_V2, func(router *route.RouterGroup) {
 		router.GET("/unverity_users", getUnVerityUsers)
 		router.POST("/verity_user/:id", verityUser)
 		router.GET("/set-admin/:id", setAdmin)
-	}, router.V2)
+	})
 }
 
-func getUnVerityUsers(c *gin.Context) {
+func getUnVerityUsers(ctx context.Context, c *app.RequestContext) {
 	r := handle.NewResponse(c)
 	collection := global.GetMgoDb("abcp").Collection("user")
 	res, err := collection.Find(context.TODO(), bson.M{"pow": config.TOURIST_POW})
@@ -39,7 +40,7 @@ func getUnVerityUsers(c *gin.Context) {
 	r.Success(users)
 }
 
-func verityUser(c *gin.Context) {
+func verityUser(ctx context.Context, c *app.RequestContext) {
 	r := handle.NewResponse(c)
 	id := c.Query("id")
 	collection := global.GetMgoDb("abcp").Collection("user")
@@ -53,7 +54,7 @@ func verityUser(c *gin.Context) {
 	r.Success(nil)
 }
 
-func setAdmin(c *gin.Context) {
+func setAdmin(ctx context.Context, c *app.RequestContext) {
 	r := handle.NewResponse(c)
 	id := c.Query("id")
 	collection := global.GetMgoDb("abcp").Collection("user")

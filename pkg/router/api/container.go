@@ -2,25 +2,27 @@ package api
 
 import (
 	"cloud-platform/global"
-	"cloud-platform/internal/base"
-	"cloud-platform/internal/base/cloud"
-	"cloud-platform/internal/handle"
-	"cloud-platform/internal/router"
-	"cloud-platform/internal/service"
+	"cloud-platform/pkg/base"
+	"cloud-platform/pkg/base/cloud"
+	"cloud-platform/pkg/handle"
+	"cloud-platform/pkg/router/manager"
+	"cloud-platform/pkg/service"
+	"context"
 
 	"fmt"
 
-	"github.com/gin-gonic/gin"
+	"github.com/cloudwego/hertz/pkg/app"
+	"github.com/cloudwego/hertz/pkg/route"
 	"github.com/golang/glog"
 )
 
 func init() {
-	router.Register(func(router gin.IRoutes) {
+	manager.RouteHandler.RegisterRouter(manager.LEVEL_V1, func(router *route.RouterGroup) {
 		router.POST("/containers", createContainer)
 		router.GET("/containers", getContainers)
-	}, router.V1)
+	})
 
-	router.Register(func(router gin.IRoutes) {
+	manager.RouteHandler.RegisterRouter(manager.LEVEL_V3, func(router *route.RouterGroup) {
 		router.GET("/containers/:id", getContainer)
 		router.DELETE("/containers/:id", removeContainer)
 		router.GET("/containers/:id/start", startContainer)
@@ -28,11 +30,11 @@ func init() {
 		router.GET("/containers/:id/restart", restartContainer)
 		router.POST("/containers/:id/makeImage", makeImage)
 		router.GET("/containers/:id/log", getContainerLog)
-	}, router.V3)
+	})
 }
 
 // 创建容器
-func createContainer(c *gin.Context) {
+func createContainer(ctx context.Context, c *app.RequestContext) {
 	r := handle.NewResponse(c)
 	container := &cloud.Container{}
 	err := c.BindJSON(&container)
@@ -63,7 +65,7 @@ func createContainer(c *gin.Context) {
 }
 
 // 根据 id 获取容器信息
-func getContainer(c *gin.Context) {
+func getContainer(ctx context.Context, c *app.RequestContext) {
 	r := handle.NewResponse(c)
 	id := c.Param("id")
 	container := &cloud.Container{}
@@ -82,7 +84,7 @@ func getContainer(c *gin.Context) {
 }
 
 // 根据用户获取容器
-func getContainers(c *gin.Context) {
+func getContainers(ctx context.Context, c *app.RequestContext) {
 	r := handle.NewResponse(c)
 	user, _ := c.Get("user")
 	err, code, containers := service.GetContainers(user.(*base.User))
@@ -98,7 +100,7 @@ func getContainers(c *gin.Context) {
 }
 
 // 删除容器
-func removeContainer(c *gin.Context) {
+func removeContainer(ctx context.Context, c *app.RequestContext) {
 	r := handle.NewResponse(c)
 	id := c.Param("id")
 	user, _ := c.Get("user")
@@ -124,7 +126,7 @@ func removeContainer(c *gin.Context) {
 }
 
 // 开启容器
-func startContainer(c *gin.Context) {
+func startContainer(ctx context.Context, c *app.RequestContext) {
 	r := handle.NewResponse(c)
 	id := c.Param("id")
 	var err error
@@ -146,7 +148,7 @@ func startContainer(c *gin.Context) {
 }
 
 // 停止容器
-func stopContainer(c *gin.Context) {
+func stopContainer(ctx context.Context, c *app.RequestContext) {
 	r := handle.NewResponse(c)
 	id := c.Param("id")
 	var err error
@@ -168,7 +170,7 @@ func stopContainer(c *gin.Context) {
 }
 
 // 重启容器
-func restartContainer(c *gin.Context) {
+func restartContainer(ctx context.Context, c *app.RequestContext) {
 	r := handle.NewResponse(c)
 	id := c.Param("id")
 	var err error
@@ -190,7 +192,7 @@ func restartContainer(c *gin.Context) {
 }
 
 // 根据容器制作镜像
-func makeImage(c *gin.Context) {
+func makeImage(ctx context.Context, c *app.RequestContext) {
 	r := handle.NewResponse(c)
 	image := &cloud.Image{}
 	id := c.Param("id")
@@ -219,7 +221,7 @@ func makeImage(c *gin.Context) {
 }
 
 // 获取容器日志
-func getContainerLog(c *gin.Context) {
+func getContainerLog(ctx context.Context, c *app.RequestContext) {
 	r := handle.NewResponse(c)
 	id := c.Param("id")
 	var err error

@@ -1,6 +1,7 @@
-package router
+package api
 
 import (
+	router "cloud-platform/pkg/router/manager"
 	"context"
 
 	"github.com/cloudwego/hertz/pkg/app"
@@ -10,7 +11,7 @@ import (
 )
 
 func init() {
-	RouteHandler.RegisterRouter(LEVEL_GLOBAL, func(r *route.RouterGroup) {
+	router.RouteHandler.RegisterRouter(router.LEVEL_GLOBAL, func(r *route.RouterGroup) {
 		r.GET("/test", Test)
 	})
 }

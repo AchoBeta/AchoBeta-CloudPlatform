@@ -2,9 +2,9 @@ package load
 
 import (
 	"cloud-platform/global"
-	"cloud-platform/internal/base/cloud"
-	"cloud-platform/internal/base/config"
-	"cloud-platform/internal/base/constant"
+	"cloud-platform/pkg/base/cloud"
+	"cloud-platform/pkg/base/config"
+	"cloud-platform/pkg/base/constant"
 	"flag"
 
 	"context"

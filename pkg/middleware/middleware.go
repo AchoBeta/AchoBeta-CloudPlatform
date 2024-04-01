@@ -2,10 +2,10 @@ package middleware
 
 import (
 	"cloud-platform/global"
-	"cloud-platform/internal/base"
-	"cloud-platform/internal/base/config"
-	commonx "cloud-platform/internal/pkg/common"
+	"cloud-platform/pkg/base"
+	"cloud-platform/pkg/base/config"
 	"cloud-platform/pkg/handle"
+	commonx "cloud-platform/pkg/handle/common"
 	"context"
 	"fmt"
 	"time"

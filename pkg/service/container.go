@@ -2,9 +2,9 @@ package service
 
 import (
 	"cloud-platform/global"
-	"cloud-platform/internal/base"
-	"cloud-platform/internal/base/cloud"
-	"cloud-platform/internal/base/constant"
+	"cloud-platform/pkg/base"
+	"cloud-platform/pkg/base/cloud"
+	"cloud-platform/pkg/base/constant"
 	"context"
 	"fmt"
 

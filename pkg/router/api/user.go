@@ -1,41 +1,37 @@
 package api
 
 import (
-	"bytes"
 	"cloud-platform/global"
-	"cloud-platform/internal/base"
-	"cloud-platform/internal/handle"
-	"cloud-platform/internal/router"
-	"cloud-platform/internal/service"
-	"fmt"
-	"net/http"
-	"time"
+	"cloud-platform/pkg/base"
+	"cloud-platform/pkg/handle"
+	"cloud-platform/pkg/router/manager"
+	"cloud-platform/pkg/service"
+	"context"
 
-	"github.com/dchest/captcha"
-	"github.com/gin-gonic/gin"
+	"github.com/cloudwego/hertz/pkg/app"
+	"github.com/cloudwego/hertz/pkg/route"
 	"github.com/golang/glog"
 )
 
 func init() {
-	router.Register(func(router gin.IRoutes) {
+	manager.RouteHandler.RegisterRouter(manager.LEVEL_GLOBAL, func(router *route.RouterGroup) {
 		router.POST("/register", register)
 		router.POST("/login", login)
-		router.GET("/captcha", captcha1)
-	}, router.V0)
-
-	router.Register(func(router gin.IRoutes) {
+		// todo router.GET("/captcha", captcha1)
+	})
+	manager.RouteHandler.RegisterRouter(manager.LEVEL_V1, func(router *route.RouterGroup) {
 		router.GET("/logout", logout)
-	}, router.V1)
+	})
 
-	router.Register(func(router gin.IRoutes) {
+	manager.RouteHandler.RegisterRouter(manager.LEVEL_V2, func(router *route.RouterGroup) {
 		router.GET("/users", getUsers)
-	}, router.V2)
+	})
 }
 
-func logout(c *gin.Context) {
+func logout(ctx context.Context, c *app.RequestContext) {
 	token := c.GetHeader("Authorization")
 	r := handle.NewResponse(c)
-	_, err := global.Rdb.Del(token).Result()
+	_, err := global.Rdb.Del(string(token)).Result()
 	if err != nil {
 		r.Error(handle.INTERNAL_ERROR)
 	} else {
@@ -43,7 +39,7 @@ func logout(c *gin.Context) {
 	}
 }
 
-func login(c *gin.Context) {
+func login(ctx context.Context, c *app.RequestContext) {
 	username := c.PostForm("username")
 	password := c.PostForm("password")
 	captcha := c.PostForm("captcha")
@@ -76,7 +72,7 @@ func login(c *gin.Context) {
 }
 
 // Register 注册账号, 成功后返回主键id
-func register(c *gin.Context) {
+func register(ctx context.Context, c *app.RequestContext) {
 	username := c.PostForm("username")
 	name := c.PostForm("name")
 	password := c.PostForm("password")
@@ -107,20 +103,7 @@ func register(c *gin.Context) {
 	}
 }
 
-// 验证码
-func captcha1(c *gin.Context) {
-	w, h := 77, 36
-	captchaId := captcha.NewLen(4)
-	global.Rdb.Set(fmt.Sprintf(base.CAPTCHA, captchaId), 1, 30*time.Minute)
-	err := writeResponse(c.Writer, c.Request, captchaId, ".png", "zh", false, w, h)
-	if err != nil {
-		glog.Errorf("create captcha error ! msg: %v\n", err.Error())
-		r := handle.NewResponse(c)
-		r.Error(handle.INTERNAL_ERROR)
-	}
-}
-
-func getUsers(c *gin.Context) {
+func getUsers(ctx context.Context, c *app.RequestContext) {
 	r := handle.NewResponse(c)
 	user := &base.DTOUser{}
 	c.BindJSON(user)
@@ -136,26 +119,40 @@ func getUsers(c *gin.Context) {
 	}
 }
 
-func writeResponse(w http.ResponseWriter, r *http.Request, id, ext, lang string, download bool, width, height int) error {
-	w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
-	w.Header().Set("Pragma", "no-cache")
-	w.Header().Set("Expires", "0")
+// // 验证码
+// func captcha1(ctx context.Context, c *app.RequestContext) {
+// 	w, h := 77, 36
+// 	captchaId := captcha.NewLen(4)
+// 	global.Rdb.Set(fmt.Sprintf(base.CAPTCHA, captchaId), 1, 30*time.Minute)
 
-	var content bytes.Buffer
-	switch ext {
-	case ".png":
-		w.Header().Set("Content-Type", "image/png")
-		_ = captcha.WriteImage(&content, id, width, height)
-	case ".wav":
-		w.Header().Set("Content-Type", "audio/x-wav")
-		_ = captcha.WriteAudio(&content, id, lang)
-	default:
-		return captcha.ErrNotFound
-	}
+// 	err := writeResponse(httptest.NewRecorder(), c.Request, captchaId, ".png", "zh", false, w, h)
+// 	if err != nil {
+// 		glog.Errorf("create captcha error ! msg: %v\n", err.Error())
+// 		r := handle.NewResponse(c)
+// 		r.Error(handle.INTERNAL_ERROR)
+// 	}
+// }
 
-	if download {
-		w.Header().Set("Content-Type", "application/octet-stream")
-	}
-	http.ServeContent(w, r, id+ext, time.Time{}, bytes.NewReader(content.Bytes()))
-	return nil
-}
+// func writeResponse(w http.ResponseWriter, r *http.Request, id, ext, lang string, download bool, width, height int) error {
+// 	w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
+// 	w.Header().Set("Pragma", "no-cache")
+// 	w.Header().Set("Expires", "0")
+
+// 	var content bytes.Buffer
+// 	switch ext {
+// 	case ".png":
+// 		w.Header().Set("Content-Type", "image/png")
+// 		_ = captcha.WriteImage(&content, id, width, height)
+// 	case ".wav":
+// 		w.Header().Set("Content-Type", "audio/x-wav")
+// 		_ = captcha.WriteAudio(&content, id, lang)
+// 	default:
+// 		return captcha.ErrNotFound
+// 	}
+
+// 	if download {
+// 		w.Header().Set("Content-Type", "application/octet-stream")
+// 	}
+// 	http.ServeContent(w, r, id+ext, time.Time{}, bytes.NewReader(content.Bytes()))
+// 	return nil
+// }

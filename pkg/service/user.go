@@ -2,9 +2,9 @@ package service
 
 import (
 	"cloud-platform/global"
-	"cloud-platform/internal/base"
-	"cloud-platform/internal/base/config"
-	commonx "cloud-platform/internal/pkg/common"
+	"cloud-platform/pkg/base"
+	"cloud-platform/pkg/base/config"
+	commonx "cloud-platform/pkg/handle/common"
 	"context"
 	"crypto/sha256"
 	"encoding/base64"

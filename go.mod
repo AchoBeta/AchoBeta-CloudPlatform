@@ -4,7 +4,6 @@ go 1.21.4
 
 require (
 	github.com/cloudwego/hertz v0.8.1
-	github.com/dchest/captcha v1.0.0
 	github.com/gin-gonic/gin v1.9.1
 	github.com/go-redis/redis v6.15.9+incompatible
 	github.com/golang/glog v1.2.0

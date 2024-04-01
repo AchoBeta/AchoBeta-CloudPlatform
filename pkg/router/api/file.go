@@ -1,8 +1,9 @@
 package api
 
 import (
-	"cloud-platform/internal/handle"
-	"cloud-platform/internal/router"
+	"cloud-platform/pkg/handle"
+
+	"cloud-platform/pkg/router/manager"
 	"context"
 	"encoding/base64"
 	"fmt"
@@ -12,15 +13,16 @@ import (
 	"strings"
 	"time"
 
-	"github.com/gin-gonic/gin"
+	"github.com/cloudwego/hertz/pkg/app"
+	"github.com/cloudwego/hertz/pkg/route"
 	"github.com/golang/glog"
 	"github.com/tencentyun/cos-go-sdk-v5"
 )
 
 func init() {
-	router.Register(func(router gin.IRoutes) {
-		router.POST("/file/upload", Upload)
-	}, router.V1)
+	manager.RouteHandler.RegisterRouter(manager.LEVEL_GLOBAL, func(router *route.RouterGroup) {
+		router.POST("/upload", Upload)
+	})
 }
 
 const (
@@ -34,7 +36,7 @@ const (
 	COS_URL_FORMAT  = "http://%s-%s.cos.%s.myqcloud.com" // 此项固定
 )
 
-func Upload(c *gin.Context) {
+func Upload(ctx context.Context, c *app.RequestContext) {
 	r := handle.NewResponse(c)
 	f, err := c.FormFile("file")
 	if err != nil {

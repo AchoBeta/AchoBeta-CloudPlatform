@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	commonx "cloud-platform/internal/pkg/common"
+	commonx "cloud-platform/pkg/handle/common"
 
 	"github.com/go-redis/redis"
 	"github.com/mitchellh/mapstructure"
