@@ -12,7 +12,7 @@ import (
 func init() {
 	RegisterRouter(func(r *route.RouterGroup) {
 		r.GET("/test", Test)
-	}, V1Router)
+	}, LEVEL_GLOBAL)
 }
 
 func Test(ctx context.Context, c *app.RequestContext) {
