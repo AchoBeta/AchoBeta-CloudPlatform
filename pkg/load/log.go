@@ -54,8 +54,7 @@ func InitLog(logPath string) {
 
 	infoHook := createHook(file)
 	errHook := createHook(errfile)
-
-	logger := hertzzap.NewLogger(hertzzap.WithCores(
+	optionWithCores := hertzzap.WithCores(
 		hertzzap.CoreConfig{
 			//将info及以下写入logPath，NewConsoleEncoder 是非结构化输出
 			Enc: zapcore.NewConsoleEncoder(encoderConfig),
@@ -70,7 +69,9 @@ func InitLog(logPath string) {
 			Enc: zapcore.NewJSONEncoder(encoderConfig),
 			Ws:  zapcore.NewMultiWriteSyncer(zapcore.AddSync(os.Stdout)),
 			Lvl: logLevel,
-		}))
+		})
+
+	logger := hertzzap.NewLogger(optionWithCores)
 
 	logger.SetOutput(infoHook)
 	logger.SetLevel(hlog.LevelDebug)
