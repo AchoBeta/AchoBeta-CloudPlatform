@@ -6,14 +6,21 @@ import (
 	"cloud-platform/pkg/base/config"
 	"cloud-platform/pkg/handle"
 	commonx "cloud-platform/pkg/handle/common"
+	"cloud-platform/pkg/router/manager"
 	"context"
 	"fmt"
 	"time"
 
 	"github.com/cloudwego/hertz/pkg/app"
+	"github.com/cloudwego/hertz/pkg/common/hlog"
+	"github.com/google/uuid"
 
 	"github.com/go-redis/redis"
 )
+
+func init() {
+	manager.RouteHandler.RegisterMiddleware(manager.LEVEL_GLOBAL, AddTraceId, false)
+}
 
 func TokenVer() app.HandlerFunc {
 	return func(c context.Context, ctx *app.RequestContext) {
@@ -34,7 +41,7 @@ func TokenVer() app.HandlerFunc {
 				ctx.Abort()
 				return
 			}
-			global.Logger.Errorf("redis get token error ! msg: %s", cmd.Err().Error())
+			hlog.Errorf("redis get token error ! msg: %s", cmd.Err().Error())
 			ctx.Abort()
 			return
 		}
@@ -42,7 +49,7 @@ func TokenVer() app.HandlerFunc {
 		commonx.JsonToStruct(cmd.Val(), user)
 		cmd1 := global.Rdb.Expire(fmt.Sprintf(base.TOKEN, token), 30*time.Minute)
 		if cmd1.Err() != nil {
-			global.Logger.Errorf("token extension of time error ! msg: %s\n", cmd1.Err().Error())
+			hlog.Errorf("token extension of time error ! msg: %s\n", cmd1.Err().Error())
 			ctx.Abort()
 			return
 		}
@@ -80,5 +87,15 @@ func ContainerVer() app.HandlerFunc {
 		}
 		r.Error(handle.INSUFFICENT_PERMISSIONS)
 		ctx.Abort()
+	}
+}
+
+func AddTraceId() app.HandlerFunc {
+	return func(c context.Context, ctx *app.RequestContext) {
+		traceId := ctx.GetHeader("traceId")
+		if len(traceId) == 0 {
+			traceId = []byte(uuid.New().String())
+		}
+		ctx.Set("traceId", traceId)
 	}
 }

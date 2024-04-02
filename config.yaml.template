@@ -6,7 +6,8 @@ app:
   startPort: 30000
   salt: MTQ1NzczNDIz    # 哈希加密时用到的盐，可不填
 options:
-  logFilePath: 
+  # 只需要写到目录级别
+  logFilePath: ./logs
 
 db:
   mongo:

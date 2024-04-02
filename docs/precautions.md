@@ -21,7 +21,7 @@ func TestHSet(t *testing.T) {
 	}
 	resByte ,err := json.Marshal(stu)
 	if err != nil {
-		global.Logger.Error(err)
+		hlog.Error(err)
 		return
 	}
 	fmt.Println(resByte)

@@ -12,6 +12,7 @@ import (
 	"fmt"
 
 	"github.com/cloudwego/hertz/pkg/app"
+	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"github.com/cloudwego/hertz/pkg/route"
 )
 
@@ -51,14 +52,14 @@ func createContainer(ctx context.Context, c *app.RequestContext) {
 	if code == 0 {
 		r.Success(nil)
 	} else if code == 1 {
-		global.Logger.Errorf("[cmd] run container error ! msg: %s\n", err.Error())
+		hlog.Errorf("[cmd] run container error ! msg: %s\n", err.Error())
 		r.Error(handle.CONTAINER_CREATE_FAIL)
 		return
 	} else if code == 2 {
-		global.Logger.Errorf("[cmd] set container ssh pwd error ! msg: %s\n", err.Error())
+		hlog.Errorf("[cmd] set container ssh pwd error ! msg: %s\n", err.Error())
 		r.Error(handle.INTERNAL_ERROR)
 	} else if code == 3 {
-		global.Logger.Errorf("[db] insert container error ! msg: %s\n", err.Error())
+		hlog.Errorf("[db] insert container error ! msg: %s\n", err.Error())
 		r.Error(handle.INTERNAL_ERROR)
 	}
 }
@@ -74,10 +75,10 @@ func getContainer(ctx context.Context, c *app.RequestContext) {
 	} else if code == 1 {
 		r.Error(handle.CONTAINER_NOT_FOUND)
 	} else if code == 2 {
-		global.Logger.Errorf("[db] find container error ! msg: %s\n", err.Error())
+		hlog.Errorf("[db] find container error ! msg: %s\n", err.Error())
 		r.Error(handle.INTERNAL_ERROR)
 	} else if code == 3 {
-		global.Logger.Errorf("decode container error ! msg: %s\n", err.Error())
+		hlog.Errorf("decode container error ! msg: %s\n", err.Error())
 		r.Error(handle.INTERNAL_ERROR)
 	}
 }
@@ -90,10 +91,10 @@ func getContainers(ctx context.Context, c *app.RequestContext) {
 	if code == 0 {
 		r.Success(containers)
 	} else if code == 1 {
-		global.Logger.Errorf("[db] find containers error ! msg: %s\n", err.Error())
+		hlog.Errorf("[db] find containers error ! msg: %s\n", err.Error())
 		r.Error(handle.INTERNAL_ERROR)
 	} else if code == 2 {
-		global.Logger.Errorf("decode container error ! msg: %s\n", err.Error())
+		hlog.Errorf("decode container error ! msg: %s\n", err.Error())
 		r.Error(handle.INTERNAL_ERROR)
 	}
 }
@@ -113,13 +114,13 @@ func removeContainer(ctx context.Context, c *app.RequestContext) {
 	if code == 0 {
 		r.Success(nil)
 	} else if code == 1 {
-		global.Logger.Errorf("[cmd] delete container error ! msg: %s\n", err.Error())
+		hlog.Errorf("[cmd] delete container error ! msg: %s\n", err.Error())
 		r.Error(handle.CONTAINER_REMOVE_FAIL)
 	} else if code == 2 {
-		global.Logger.Errorf("[db] delete container error ! msg: %s\n", err.Error())
+		hlog.Errorf("[db] delete container error ! msg: %s\n", err.Error())
 		r.Error(handle.CONTAINER_REMOVE_FAIL)
 	} else if code == 3 {
-		global.Logger.Errorf("[db] update user containers error ! msg: %s\n", err.Error())
+		hlog.Errorf("[db] update user containers error ! msg: %s\n", err.Error())
 		r.Error(handle.INTERNAL_ERROR)
 	}
 }
@@ -138,10 +139,10 @@ func startContainer(ctx context.Context, c *app.RequestContext) {
 	if code == 0 {
 		r.Success(nil)
 	} else if code == 1 {
-		global.Logger.Errorf("[cmd] start container error ! msg: %s\n", err.Error())
+		hlog.Errorf("[cmd] start container error ! msg: %s\n", err.Error())
 		r.Error(handle.CONTAINER_START_FAIL)
 	} else if code == 2 {
-		global.Logger.Errorf("[db] start container error ! msg: %s\n", err.Error())
+		hlog.Errorf("[db] start container error ! msg: %s\n", err.Error())
 		r.Error(handle.CONTAINER_START_FAIL)
 	}
 }
@@ -160,10 +161,10 @@ func stopContainer(ctx context.Context, c *app.RequestContext) {
 	if code == 0 {
 		r.Success(nil)
 	} else if code == 1 {
-		global.Logger.Errorf("[cmd] stop container error ! msg: %s\n", err.Error())
+		hlog.Errorf("[cmd] stop container error ! msg: %s\n", err.Error())
 		r.Error(handle.CONTAINER_STOP_FAIL)
 	} else if code == 2 {
-		global.Logger.Errorf("[db] stop container error ! msg: %s\n", err.Error())
+		hlog.Errorf("[db] stop container error ! msg: %s\n", err.Error())
 		r.Error(handle.CONTAINER_STOP_FAIL)
 	}
 }
@@ -182,10 +183,10 @@ func restartContainer(ctx context.Context, c *app.RequestContext) {
 	if code == 0 {
 		r.Success(nil)
 	} else if code == 1 {
-		global.Logger.Errorf("[cmd] restart container error ! msg: %s\n", err.Error())
+		hlog.Errorf("[cmd] restart container error ! msg: %s\n", err.Error())
 		r.Error(handle.CONTAINER_RESTART_FAIL)
 	} else if code == 2 {
-		global.Logger.Errorf("[db] restart container error ! msg: %s\n", err.Error())
+		hlog.Errorf("[db] restart container error ! msg: %s\n", err.Error())
 		r.Error(handle.CONTAINER_RESTART_FAIL)
 	}
 }
@@ -211,10 +212,10 @@ func makeImage(ctx context.Context, c *app.RequestContext) {
 	if code == 0 {
 		r.Success(nil)
 	} else if code == 1 {
-		global.Logger.Errorf("[cmd] make image from container error ! msg: %s\n", err.Error())
+		hlog.Errorf("[cmd] make image from container error ! msg: %s\n", err.Error())
 		r.Error(handle.IMAGE_CREATE_FAIL)
 	} else if code == 2 {
-		global.Logger.Errorf("[db] make image from container error ! msg: %s\n", err.Error())
+		hlog.Errorf("[db] make image from container error ! msg: %s\n", err.Error())
 		r.Error(handle.IMAGE_CREATE_FAIL)
 	}
 }
@@ -234,7 +235,7 @@ func getContainerLog(ctx context.Context, c *app.RequestContext) {
 	if code == 0 {
 		r.Success(out)
 	} else if code == 1 {
-		global.Logger.Errorf("[cmd] get container log error ! msg: %s\n", err.Error())
+		hlog.Errorf("[cmd] get container log error ! msg: %s\n", err.Error())
 		r.Error(handle.INTERNAL_ERROR)
 	}
 }

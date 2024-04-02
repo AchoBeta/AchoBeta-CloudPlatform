@@ -1,11 +1,11 @@
 package manager
 
 import (
-	"cloud-platform/global"
 	"fmt"
 
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/app/server"
+	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"github.com/cloudwego/hertz/pkg/route"
 )
 
@@ -69,7 +69,7 @@ func (rm *RouteManager) Register(h *server.Hertz) {
 			router(v)
 		}
 	}
-	global.Logger.Infof("Registering routes, total routes: %d, total middlewares: %d", routeCount, middlewareCount)
+	hlog.Infof("Registering routes, total routes: %d, total middlewares: %d", routeCount, middlewareCount)
 }
 
 func (rm *RouteManager) RegisterRouter(level RouteLevel, router PathHandler) {

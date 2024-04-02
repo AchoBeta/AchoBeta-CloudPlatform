@@ -6,6 +6,8 @@ require (
 	github.com/cloudwego/hertz v0.8.1
 	github.com/gin-gonic/gin v1.9.1
 	github.com/go-redis/redis v6.15.9+incompatible
+	github.com/google/uuid v1.4.0
+	github.com/hertz-contrib/logger/zap v1.1.0
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/natefinch/lumberjack v2.0.0+incompatible
 	github.com/spf13/viper v1.18.2

@@ -1,20 +1,21 @@
 package commonx
 
 import (
-	"cloud-platform/global"
 	"encoding/json"
+
+	"github.com/cloudwego/hertz/pkg/common/hlog"
 )
 
 func StructToMap(value interface{}) map[string]interface{} {
 	m := make(map[string]interface{})
 	resJson, err := json.Marshal(value)
 	if err != nil {
-		global.Logger.Errorf("Json Marshal failed ,msg: %s", err.Error())
+		hlog.Errorf("Json Marshal failed ,msg: %s", err.Error())
 		return nil
 	}
 	err = json.Unmarshal(resJson, &m)
 	if err != nil {
-		global.Logger.Errorf("Json Unmarshal failed,msg : %s", err.Error())
+		hlog.Errorf("Json Unmarshal failed,msg : %s", err.Error())
 		return nil
 	}
 	return m

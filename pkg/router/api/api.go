@@ -5,6 +5,7 @@ import (
 	"context"
 
 	"github.com/cloudwego/hertz/pkg/app"
+	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"github.com/cloudwego/hertz/pkg/common/utils"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 	"github.com/cloudwego/hertz/pkg/route"
@@ -17,5 +18,6 @@ func init() {
 }
 
 func Test(ctx context.Context, c *app.RequestContext) {
+	hlog.Infof("test-----------------")
 	c.JSON(consts.StatusOK, utils.H{"ping": "pong"})
 }
