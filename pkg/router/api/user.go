@@ -1,16 +1,20 @@
 package api
 
 import (
+	"bytes"
 	"cloud-platform/global"
 	"cloud-platform/pkg/base"
 	"cloud-platform/pkg/handle"
 	"cloud-platform/pkg/router/manager"
 	"cloud-platform/pkg/service"
 	"context"
+	"fmt"
+	"time"
 
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"github.com/cloudwego/hertz/pkg/route"
+	"github.com/dchest/captcha"
 )
 
 func init() {
@@ -119,40 +123,40 @@ func getUsers(ctx context.Context, c *app.RequestContext) {
 	}
 }
 
-// // 验证码
-// func captcha1(ctx context.Context, c *app.RequestContext) {
-// 	w, h := 77, 36
-// 	captchaId := captcha.NewLen(4)
-// 	global.Rdb.Set(fmt.Sprintf(base.CAPTCHA, captchaId), 1, 30*time.Minute)
+// 验证码
+func captcha1(ctx context.Context, c *app.RequestContext) {
+	w, h := 77, 36
+	captchaId := captcha.NewLen(4)
+	global.Rdb.Set(fmt.Sprintf(base.CAPTCHA, captchaId), 1, 30*time.Minute)
 
-// 	err := writeResponse(httptest.NewRecorder(), c.Request, captchaId, ".png", "zh", false, w, h)
-// 	if err != nil {
-// 		hlog.Errorf("create captcha error ! msg: %v\n", err.Error())
-// 		r := handle.NewResponse(c)
-// 		r.Error(handle.INTERNAL_ERROR)
-// 	}
-// }
+	err := writeResponse(c, captchaId, ".png", "zh", false, w, h)
+	if err != nil {
+		hlog.Errorf("create captcha error ! msg: %v\n", err.Error())
+		r := handle.NewResponse(c)
+		r.Error(handle.INTERNAL_ERROR)
+	}
+	c.Flush()
+}
 
-// func writeResponse(w http.ResponseWriter, r *http.Request, id, ext, lang string, download bool, width, height int) error {
-// 	w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
-// 	w.Header().Set("Pragma", "no-cache")
-// 	w.Header().Set("Expires", "0")
+func writeResponse(c *app.RequestContext, id, ext, lang string, download bool, width, height int) error {
+	c.Header("Cache-Control", "no-cache, no-store, must-revalidate")
+	c.Header("Pragma", "no-cache")
+	c.Header("Expires", "0")
+	var content bytes.Buffer
+	switch ext {
+	case ".png":
+		c.Header("Content-Type", "image/png")
+		_ = captcha.WriteImage(&content, id, width, height)
+	case ".wav":
+		c.Header("Content-Type", "audio/x-wav")
+		_ = captcha.WriteAudio(&content, id, lang)
+	default:
+		return captcha.ErrNotFound
+	}
 
-// 	var content bytes.Buffer
-// 	switch ext {
-// 	case ".png":
-// 		w.Header().Set("Content-Type", "image/png")
-// 		_ = captcha.WriteImage(&content, id, width, height)
-// 	case ".wav":
-// 		w.Header().Set("Content-Type", "audio/x-wav")
-// 		_ = captcha.WriteAudio(&content, id, lang)
-// 	default:
-// 		return captcha.ErrNotFound
-// 	}
-
-// 	if download {
-// 		w.Header().Set("Content-Type", "application/octet-stream")
-// 	}
-// 	http.ServeContent(w, r, id+ext, time.Time{}, bytes.NewReader(content.Bytes()))
-// 	return nil
-// }
+	if download {
+		c.Header("Content-Type", "application/octet-stream")
+	}
+	c.Write(content.Bytes())
+	return nil
+}

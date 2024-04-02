@@ -3,6 +3,7 @@ module cloud-platform
 go 1.21.4
 
 require (
+	github.com/apache/thrift v0.20.0
 	github.com/cloudwego/hertz v0.8.1
 	github.com/gin-gonic/gin v1.9.1
 	github.com/go-redis/redis v6.15.9+incompatible
@@ -25,6 +26,7 @@ require (
 	github.com/chenzhuoyu/iasm v0.9.1 // indirect
 	github.com/clbanning/mxj v1.8.4 // indirect
 	github.com/cloudwego/netpoll v0.5.0 // indirect
+	github.com/dchest/captcha v1.0.0 // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.3 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
