@@ -12,6 +12,6 @@ func main() {
 	load.Init()
 	// 工程进入前夕，释放资源
 	defer load.Eve()
-	/** gin 启动要放在最后*/
-	router.RunS()
+	/** server 启动要放在最后*/
+	router.RunServer()
 }

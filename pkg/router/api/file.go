@@ -1,6 +1,7 @@
 package api
 
 import (
+	"cloud-platform/global"
 	"cloud-platform/pkg/handle"
 
 	"cloud-platform/pkg/router/manager"
@@ -15,7 +16,6 @@ import (
 
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/route"
-	"github.com/golang/glog"
 	"github.com/tencentyun/cos-go-sdk-v5"
 )
 
@@ -40,7 +40,7 @@ func Upload(ctx context.Context, c *app.RequestContext) {
 	r := handle.NewResponse(c)
 	f, err := c.FormFile("file")
 	if err != nil {
-		glog.Errorf("file upload error! msg: %s", err.Error())
+		global.Logger.Errorf("file upload error! msg: %s", err.Error())
 		r.Error(handle.INTERNAL_ERROR)
 		return
 	}
@@ -55,7 +55,7 @@ func Upload(ctx context.Context, c *app.RequestContext) {
 	fileName := base64.StdEncoding.EncodeToString([]byte(name[0])) + name[1]
 	url, err := upload(fileName, file)
 	if err != nil {
-		glog.Errorf("file upload error! msg:", err.Error())
+		global.Logger.Errorf("file upload error! msg:", err.Error())
 		r.Error(handle.INTERNAL_FILE_UPLOAD_ERROR)
 		return
 	}

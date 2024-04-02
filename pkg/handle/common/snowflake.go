@@ -1,11 +1,10 @@
 package commonx
 
 import (
+	"cloud-platform/global"
 	"errors"
 	"sync"
 	"time"
-
-	"github.com/golang/glog"
 )
 
 type Snowflake struct {
@@ -38,7 +37,7 @@ func GetNextSnowflakeID() int64 {
 			var err error
 			snow, err = newSnowflake(machineId)
 			if err != nil {
-				glog.Errorf("create snowflake error ! msg: ", err.Error())
+				global.Logger.Errorf("create snowflake error ! msg: ", err.Error())
 				return -1
 			}
 		}

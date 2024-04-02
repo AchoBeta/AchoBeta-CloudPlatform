@@ -10,8 +10,8 @@ import (
 	"github.com/cloudwego/hertz/pkg/app/server"
 )
 
-func RunS() {
-	h, err := Listen()
+func RunServer() {
+	h, err := listen()
 	if err != nil {
 		global.Logger.Errorf("Listen error: %v", err)
 		panic(err.Error())
@@ -19,7 +19,7 @@ func RunS() {
 	h.Spin()
 }
 
-func Listen() (*server.Hertz, error) {
+func listen() (*server.Hertz, error) {
 	h := server.Default(server.WithHostPorts(fmt.Sprintf("%s:%d", global.Config.App.Host, global.Config.App.Port)))
 	router.RouteHandler.Register(h)
 	return h, nil

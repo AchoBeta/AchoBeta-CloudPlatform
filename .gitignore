@@ -17,6 +17,7 @@
 # vendor/
 rsa/
 log/
+logs/
 vendor/
 # ignore database data
 script/database/data/

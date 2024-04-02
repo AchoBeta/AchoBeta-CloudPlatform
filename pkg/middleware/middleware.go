@@ -13,8 +13,6 @@ import (
 	"github.com/cloudwego/hertz/pkg/app"
 
 	"github.com/go-redis/redis"
-
-	"github.com/golang/glog"
 )
 
 func TokenVer() app.HandlerFunc {
@@ -36,7 +34,7 @@ func TokenVer() app.HandlerFunc {
 				ctx.Abort()
 				return
 			}
-			glog.Errorf("redis get token error ! msg: %s", cmd.Err().Error())
+			global.Logger.Errorf("redis get token error ! msg: %s", cmd.Err().Error())
 			ctx.Abort()
 			return
 		}
@@ -44,7 +42,7 @@ func TokenVer() app.HandlerFunc {
 		commonx.JsonToStruct(cmd.Val(), user)
 		cmd1 := global.Rdb.Expire(fmt.Sprintf(base.TOKEN, token), 30*time.Minute)
 		if cmd1.Err() != nil {
-			glog.Errorf("token extension of time error ! msg: %s\n", cmd1.Err().Error())
+			global.Logger.Errorf("token extension of time error ! msg: %s\n", cmd1.Err().Error())
 			ctx.Abort()
 			return
 		}

@@ -11,7 +11,6 @@ import (
 
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/route"
-	"github.com/golang/glog"
 )
 
 func init() {
@@ -35,10 +34,10 @@ func getImages(ctx context.Context, c *app.RequestContext) {
 	if code == 0 {
 		r.Success(images)
 	} else if code == 1 {
-		glog.Errorf("[db] find images error ! msg: %s\n", err.Error())
+		global.Logger.Errorf("[db] find images error ! msg: %s\n", err.Error())
 		r.Error(handle.INTERNAL_ERROR)
 	} else if code == 2 {
-		glog.Errorf("decode image error ! msg: %s\n", err.Error())
+		global.Logger.Errorf("decode image error ! msg: %s\n", err.Error())
 		r.Error(handle.INTERNAL_ERROR)
 	}
 }
@@ -54,7 +53,7 @@ func getImageInfo(ctx context.Context, c *app.RequestContext) {
 	} else if code == 1 {
 		r.Error(handle.IMAGE_NOT_FIND)
 	} else if code == 2 {
-		glog.Errorf("[db] find image by id error ! msg: %s\n", err.Error())
+		global.Logger.Errorf("[db] find image by id error ! msg: %s\n", err.Error())
 		r.Error(handle.INTERNAL_ERROR)
 	}
 }
@@ -85,7 +84,7 @@ func deleteImage(ctx context.Context, c *app.RequestContext) {
 	} else if code == 1 {
 		r.Error(handle.IMAGE_NOT_FIND)
 	} else if code == 2 {
-		glog.Errorf("[db] delete image error ! msg: %v\n", err.Error())
+		global.Logger.Errorf("[db] delete image error ! msg: %v\n", err.Error())
 		r.Error(handle.INTERNAL_ERROR)
 	}
 }
@@ -124,7 +123,7 @@ func pushImage(ctx context.Context, c *app.RequestContext) {
 	if code == 0 {
 		r.Success(nil)
 	} else if code == 1 {
-		glog.Errorf("[cmd] push image error ! msg: %s/n", err.Error())
+		global.Logger.Errorf("[cmd] push image error ! msg: %s/n", err.Error())
 		r.Error(handle.IMAGE_PUSH_FAIL)
 	}
 }
