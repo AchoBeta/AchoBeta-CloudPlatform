@@ -36,7 +36,7 @@ func Init() {
 func initLog() {
 	logFilePath := flag.String("l", global.Config.Options.LogFilePath, "log file path")
 	flag.Parse()
-	InitLog(*logFilePath)
+	InitLogrus(*logFilePath)
 }
 
 func readConfig() {
@@ -122,10 +122,12 @@ func initRedis() {
 // 初始化基础镜像
 func initBaseImage() {
 	collection := global.GetMgoDb("abcp").Collection("image")
-	imageName := fmt.Sprintf("%s/abcp_base", global.Config.Docker.Hub.Host)
+	imageName := fmt.Sprintf("%s-abcp_base", global.Config.Docker.Hub.Host)
+	hlog.Infof("image name: %s", imageName)
 	filter := bson.D{{Key: "name", Value: imageName}}
 	res := collection.FindOne(context.TODO(), filter)
 	if res.Err() != nil {
+		hlog.Errorf("[db] find base images error ! msg: %s\n", res.Err().Error())
 		if res.Err() == mongo.ErrNoDocuments {
 			// 拉取远程镜像
 			hlog.Infof("====== [cmd] pull base images ======")
@@ -133,14 +135,18 @@ func initBaseImage() {
 			if err != nil {
 				hlog.Errorf("[cmd] pull base images error ! msg: %s\n", err.Error())
 			}
-			out, err := exec.Command(constant.DOCKER, constant.IMAGES, imageName+"0.1").Output()
+			out, err := exec.Command(constant.DOCKER, constant.IMAGES, imageName+":0.1").Output()
 			if err != nil {
 				hlog.Errorf("[cmd] search base images error ! msg: %s\n", err.Error())
 				return
 			}
+			hlog.Infof("output: %s\n", string(out))
 			r := regexp.MustCompile(`[^\\s]+`)
 			ss := r.FindAllString(strings.Split(string(out), "\n")[1], -1)
-			fmt.Print(ss)
+
+			if (len(ss)) < 5 {
+				hlog.Fatalf("[cmd] search base images output error, out msg: %s\n", string(out))
+			}
 			image := cloud.Image{
 				Name:       ss[0],
 				Tag:        ss[1],

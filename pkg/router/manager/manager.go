@@ -92,3 +92,9 @@ func (rm *RouteManager) RegisterMiddleware(level RouteLevel, middleware Middlewa
 	}
 	rm.Routes[level].Middlewares = append(rm.Routes[level].Middlewares, middleware)
 }
+
+// @title requestGlobalMiddleware
+// @description 注册全局中间件
+// func requestGlobalMiddleware(v *route.RouterGroup) {
+// 	v.Use(requestid.New())
+// }

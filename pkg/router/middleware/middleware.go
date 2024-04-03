@@ -96,6 +96,6 @@ func AddTraceId() app.HandlerFunc {
 		if len(traceId) == 0 {
 			traceId = []byte(uuid.New().String())
 		}
-		ctx.Set("traceId", traceId)
+		ctx.Next(c)
 	}
 }
