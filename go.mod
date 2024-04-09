@@ -8,7 +8,6 @@ require (
 	github.com/gin-gonic/gin v1.9.1
 	github.com/go-redis/redis v6.15.9+incompatible
 	github.com/google/uuid v1.6.0
-	github.com/hertz-contrib/logger/logrus v1.0.1
 	github.com/hertz-contrib/logger/zap v1.1.0
 	github.com/hertz-contrib/requestid v1.1.0
 	github.com/mitchellh/mapstructure v1.5.0
@@ -17,7 +16,7 @@ require (
 	github.com/spf13/viper v1.18.2
 	github.com/tencentyun/cos-go-sdk-v5 v0.7.47
 	go.mongodb.org/mongo-driver v1.14.0
-	go.uber.org/zap v1.27.0
+	go.uber.org/zap v1.23.0
 )
 
 require (
@@ -72,6 +71,7 @@ require (
 	github.com/xdg-go/scram v1.1.2 // indirect
 	github.com/xdg-go/stringprep v1.0.4 // indirect
 	github.com/youmark/pkcs8 v0.0.0-20201027041543-1326539a0a0a // indirect
+	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.10.0 // indirect
 	golang.org/x/arch v0.7.0 // indirect
 	golang.org/x/crypto v0.21.0 // indirect

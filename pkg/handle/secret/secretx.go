@@ -1,6 +1,7 @@
 package secretx
 
 import (
+	"cloud-platform/pkg/load/tlog"
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/x509"
@@ -8,8 +9,6 @@ import (
 	"encoding/pem"
 	"errors"
 	"io/ioutil"
-
-	"github.com/cloudwego/hertz/pkg/common/hlog"
 )
 
 // 私钥生成
@@ -25,16 +24,16 @@ func init() {
 	var err error
 	publicKey, err = ioutil.ReadFile("./rsa/rsa_public_key.pem")
 	if err != nil {
-		hlog.Errorf("init publicKey error, msg:[%s]", err.Error())
+		tlog.Errorf("init publicKey error, msg:[%s]", err.Error())
 		return
 	}
 
 	privateKey, err = ioutil.ReadFile("./rsa/rsa_private_key.pem")
 	if err != nil {
-		hlog.Errorf("init privateKey error, msg:[%s]", err.Error())
+		tlog.Errorf("init privateKey error, msg:[%s]", err.Error())
 		return
 	}
-	hlog.Infof("global key success")
+	tlog.Infof("global key success")
 }
 
 // rsaEncrypt 加密
@@ -68,7 +67,7 @@ func rsaDecrypt(ciphertext []byte) ([]byte, error) {
 func Encrypt(str string) string {
 	encrypt, err := rsaEncrypt([]byte(str))
 	if err != nil {
-		hlog.Errorf("Encrypt error, msg:[%s]", err.Error())
+		tlog.Errorf("Encrypt error, msg:[%s]", err.Error())
 		return ""
 	}
 	return base64.RawURLEncoding.EncodeToString(encrypt)
@@ -77,12 +76,12 @@ func Encrypt(str string) string {
 func Decrypt(str string) []byte {
 	strBytes, err := base64.RawURLEncoding.DecodeString(str)
 	if err != nil {
-		hlog.Errorf("base64 Decode error, msg:[%s]", err.Error())
+		tlog.Errorf("base64 Decode error, msg:[%s]", err.Error())
 		return nil
 	}
 	decrypt, err := rsaDecrypt(strBytes)
 	if err != nil {
-		hlog.Errorf("Decrypt error, msg:[%s]", err.Error())
+		tlog.Errorf("Decrypt error, msg:[%s]", err.Error())
 		return nil
 	}
 	return decrypt

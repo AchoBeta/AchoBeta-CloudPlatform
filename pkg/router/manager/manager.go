@@ -1,12 +1,13 @@
 package manager
 
 import (
+	"cloud-platform/pkg/load/tlog"
 	"fmt"
 
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/app/server"
-	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"github.com/cloudwego/hertz/pkg/route"
+	"github.com/hertz-contrib/requestid"
 )
 
 type PathHandler func(h *route.RouterGroup)
@@ -59,6 +60,7 @@ func (rm *RouteManager) Register(h *server.Hertz) {
 	for _, route := range rm.Routes {
 		v := h.Group(route.Url)
 		// 中间件注册
+		requestGlobalMiddleware(v)
 		for _, middleware := range route.Middlewares {
 			middlewareCount++
 			v.Use(middleware())
@@ -69,7 +71,7 @@ func (rm *RouteManager) Register(h *server.Hertz) {
 			router(v)
 		}
 	}
-	hlog.Infof("Registering routes, total routes: %d, total middlewares: %d", routeCount, middlewareCount)
+	tlog.Infof("Registering routes, total routes: %d, total middlewares: %d", routeCount, middlewareCount)
 }
 
 func (rm *RouteManager) RegisterRouter(level RouteLevel, router PathHandler) {
@@ -95,6 +97,6 @@ func (rm *RouteManager) RegisterMiddleware(level RouteLevel, middleware Middlewa
 
 // @title requestGlobalMiddleware
 // @description 注册全局中间件
-// func requestGlobalMiddleware(v *route.RouterGroup) {
-// 	v.Use(requestid.New())
-// }
+func requestGlobalMiddleware(v *route.RouterGroup) {
+	v.Use(requestid.New())
+}

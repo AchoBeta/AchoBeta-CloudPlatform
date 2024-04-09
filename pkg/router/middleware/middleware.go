@@ -6,14 +6,15 @@ import (
 	"cloud-platform/pkg/base/config"
 	"cloud-platform/pkg/handle"
 	commonx "cloud-platform/pkg/handle/common"
+	"cloud-platform/pkg/load/tlog"
 	"cloud-platform/pkg/router/manager"
 	"context"
 	"fmt"
 	"time"
 
 	"github.com/cloudwego/hertz/pkg/app"
-	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"github.com/google/uuid"
+	"go.uber.org/zap"
 
 	"github.com/go-redis/redis"
 )
@@ -41,7 +42,7 @@ func TokenVer() app.HandlerFunc {
 				ctx.Abort()
 				return
 			}
-			hlog.Errorf("redis get token error ! msg: %s", cmd.Err().Error())
+			tlog.Errorf("redis get token error ! msg: %s", cmd.Err().Error())
 			ctx.Abort()
 			return
 		}
@@ -49,7 +50,7 @@ func TokenVer() app.HandlerFunc {
 		commonx.JsonToStruct(cmd.Val(), user)
 		cmd1 := global.Rdb.Expire(fmt.Sprintf(base.TOKEN, token), 30*time.Minute)
 		if cmd1.Err() != nil {
-			hlog.Errorf("token extension of time error ! msg: %s\n", cmd1.Err().Error())
+			tlog.Errorf("token extension of time error ! msg: %s\n", cmd1.Err().Error())
 			ctx.Abort()
 			return
 		}
@@ -92,10 +93,12 @@ func ContainerVer() app.HandlerFunc {
 
 func AddTraceId() app.HandlerFunc {
 	return func(c context.Context, ctx *app.RequestContext) {
-		traceId := ctx.GetHeader("traceId")
-		if len(traceId) == 0 {
-			traceId = []byte(uuid.New().String())
+		// 假设 Trace ID 存在于 HTTP Header "X-Trace-ID" 中
+		traceID := ctx.Request.Header.Get("X-Request-ID")
+		if traceID == "" {
+			traceID = uuid.New().String()
 		}
+		c = tlog.NewContext(c, zap.String("traceId", traceID))
 		ctx.Next(c)
 	}
 }

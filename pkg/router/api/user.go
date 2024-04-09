@@ -5,6 +5,7 @@ import (
 	"cloud-platform/global"
 	"cloud-platform/pkg/base"
 	"cloud-platform/pkg/handle"
+	"cloud-platform/pkg/load/tlog"
 	"cloud-platform/pkg/router/manager"
 	"cloud-platform/pkg/service"
 	"context"
@@ -12,7 +13,6 @@ import (
 	"time"
 
 	"github.com/cloudwego/hertz/pkg/app"
-	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"github.com/cloudwego/hertz/pkg/route"
 	"github.com/dchest/captcha"
 )
@@ -60,17 +60,17 @@ func login(ctx context.Context, c *app.RequestContext) {
 	} else if code == 1 {
 		r.Error(handle.CAPTCHA_ERROR)
 	} else if code == 2 {
-		hlog.Errorf("[db] del captcha error ! msg: %v\n", err.Error())
+		tlog.Errorf("[db] del captcha error ! msg: %v\n", err.Error())
 		r.Error(handle.INTERNAL_ERROR)
 	} else if code == 3 {
 		r.Error(handle.USER_ACCOUNT_NOT_EXIST)
 	} else if code == 4 {
-		hlog.Errorf("user-database decode error! msg: %s", err.Error())
+		tlog.Errorf("user-database decode error! msg: %s", err.Error())
 		r.Error(handle.INTERNAL_ERROR)
 	} else if code == 5 {
 		r.Error(handle.USER_CREDENTIALS_ERROR)
 	} else if code == 6 {
-		hlog.Errorf("[db] set token to redis error ! msg: %s\n", err.Error())
+		tlog.Errorf("[db] set token to redis error ! msg: %s\n", err.Error())
 		r.Error(handle.INTERNAL_ERROR)
 	}
 }
@@ -97,12 +97,12 @@ func register(ctx context.Context, c *app.RequestContext) {
 	} else if code == 1 {
 		r.Error(handle.CAPTCHA_ERROR)
 	} else if code == 2 {
-		hlog.Errorf("[db] del captcha error ! msg: %v\n", err.Error())
+		tlog.Errorf("[db] del captcha error ! msg: %v\n", err.Error())
 		r.Error(handle.INTERNAL_ERROR)
 	} else if code == 3 {
 		r.Error(handle.USER_ACCOUNT_ALREADY_EXIST)
 	} else if code == 4 {
-		hlog.Errorf("insert user to db error! msg: %s", err.Error())
+		tlog.Errorf("insert user to db error! msg: %s", err.Error())
 		r.Error(handle.INTERNAL_ERROR)
 	}
 }
@@ -115,10 +115,10 @@ func getUsers(ctx context.Context, c *app.RequestContext) {
 	if code == 0 {
 		r.Success(users)
 	} else if code == 1 {
-		hlog.Errorf("[db] find users error ! msg: %s\n", err.Error())
+		tlog.Errorf("[db] find users error ! msg: %s\n", err.Error())
 		r.Error(handle.INTERNAL_ERROR)
 	} else if code == 2 {
-		hlog.Errorf("decode user error ! msg: %s\n", err.Error())
+		tlog.Errorf("decode user error ! msg: %s\n", err.Error())
 		r.Error(handle.INTERNAL_ERROR)
 	}
 }
@@ -131,7 +131,7 @@ func captcha1(ctx context.Context, c *app.RequestContext) {
 
 	err := writeResponse(c, captchaId, ".png", "zh", false, w, h)
 	if err != nil {
-		hlog.Errorf("create captcha error ! msg: %v\n", err.Error())
+		tlog.Errorf("create captcha error ! msg: %v\n", err.Error())
 		r := handle.NewResponse(c)
 		r.Error(handle.INTERNAL_ERROR)
 	}

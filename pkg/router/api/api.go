@@ -1,6 +1,7 @@
 package api
 
 import (
+	"cloud-platform/pkg/load/tlog"
 	router "cloud-platform/pkg/router/manager"
 	"context"
 
@@ -19,8 +20,10 @@ func init() {
 }
 
 func Test(ctx context.Context, c *app.RequestContext) {
-	lgr.Info("logrus - testxxx")
-	lgr.Warn("logrus - warn")
+	tlog.Infof("load - test")
+	tlog.CtxInfof(ctx, "load ctx info - test")
+	tlog.CtxWarnf(ctx, "load ctx warn - test")
+	tlog.CtxErrorf(ctx, "load ctx error - test")
 	c.JSON(consts.StatusOK, utils.H{"ping": "pong"})
 }
 

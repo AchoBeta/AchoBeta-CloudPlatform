@@ -4,18 +4,18 @@ import (
 	"cloud-platform/global"
 	"fmt"
 
+	"cloud-platform/pkg/load/tlog"
 	_ "cloud-platform/pkg/router/api"
 	router "cloud-platform/pkg/router/manager"
 	_ "cloud-platform/pkg/router/middleware"
 
 	"github.com/cloudwego/hertz/pkg/app/server"
-	"github.com/cloudwego/hertz/pkg/common/hlog"
 )
 
 func RunServer() {
 	h, err := listen()
 	if err != nil {
-		hlog.Errorf("Listen error: %v", err)
+		tlog.Errorf("Listen error: %v", err)
 		panic(err.Error())
 	}
 	h.Spin()

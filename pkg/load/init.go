@@ -5,6 +5,7 @@ import (
 	"cloud-platform/pkg/base/cloud"
 	"cloud-platform/pkg/base/config"
 	"cloud-platform/pkg/base/constant"
+	"cloud-platform/pkg/load/tlog"
 	"flag"
 
 	"context"
@@ -13,7 +14,6 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"github.com/go-redis/redis"
 	"github.com/spf13/viper"
 	"go.mongodb.org/mongo-driver/bson"
@@ -36,7 +36,7 @@ func Init() {
 func initLog() {
 	logFilePath := flag.String("l", global.Config.Options.LogFilePath, "log file path")
 	flag.Parse()
-	InitLogrus(*logFilePath)
+	InitLog(*logFilePath)
 }
 
 func readConfig() {
@@ -66,13 +66,13 @@ func initMongo() {
 	// 连接到MongoDB
 	global.Mgo, err = mongo.Connect(context.TODO(), clientOptions)
 	if err != nil {
-		hlog.Errorf("mongo connect error: %s", err)
+		tlog.Errorf("mongo connect error: %s", err)
 		return
 	}
 	// 检查连接
 	err = global.Mgo.Ping(context.TODO(), nil)
 	if err != nil {
-		hlog.Errorf("mongo ping error: %s", err)
+		tlog.Errorf("mongo ping error: %s", err)
 		return
 	}
 	// 检查所需要的数据库是否存在
@@ -87,7 +87,7 @@ func checkMongoDb() error {
 	// 检查所需要的数据库是否存在
 	databases, err := global.Mgo.ListDatabaseNames(context.TODO(), bson.M{})
 	if err != nil {
-		hlog.Errorf("mongo list databases error: %s", err)
+		tlog.Errorf("mongo list databases error: %s", err)
 		return err
 	}
 	for _, db := range databases {
@@ -95,11 +95,11 @@ func checkMongoDb() error {
 			return err
 		}
 	}
-	hlog.Errorf("Database 'abcp' does not exist")
+	tlog.Errorf("Database 'abcp' does not exist")
 	// 或者创建数据库
 	_, err = global.Mgo.Database("abcp").Collection("image").InsertOne(context.TODO(), bson.M{})
 	if err != nil {
-		hlog.Errorf("mongo create database error: %s", err)
+		tlog.Errorf("mongo create database error: %s", err)
 		return err
 	}
 	return nil
@@ -115,7 +115,7 @@ func initRedis() {
 
 	_, err := global.Rdb.Ping().Result()
 	if err != nil {
-		hlog.Errorf("redis connect fail! message: %s\n", err.Error())
+		tlog.Errorf("redis connect fail! message: %s\n", err.Error())
 	}
 }
 
@@ -123,29 +123,29 @@ func initRedis() {
 func initBaseImage() {
 	collection := global.GetMgoDb("abcp").Collection("image")
 	imageName := fmt.Sprintf("%s-abcp_base", global.Config.Docker.Hub.Host)
-	hlog.Infof("image name: %s", imageName)
+	tlog.Infof("image name: %s", imageName)
 	filter := bson.D{{Key: "name", Value: imageName}}
 	res := collection.FindOne(context.TODO(), filter)
 	if res.Err() != nil {
-		hlog.Errorf("[db] find base images error ! msg: %s\n", res.Err().Error())
+		tlog.Errorf("[db] find base images error ! msg: %s\n", res.Err().Error())
 		if res.Err() == mongo.ErrNoDocuments {
 			// 拉取远程镜像
-			hlog.Infof("====== [cmd] pull base images ======")
+			tlog.Infof("====== [cmd] pull base images ======")
 			_, err := exec.Command(constant.DOCKER, constant.IMAGE_PULL, imageName+":0.1").Output()
 			if err != nil {
-				hlog.Errorf("[cmd] pull base images error ! msg: %s\n", err.Error())
+				tlog.Errorf("[cmd] pull base images error ! msg: %s\n", err.Error())
 			}
 			out, err := exec.Command(constant.DOCKER, constant.IMAGES, imageName+":0.1").Output()
 			if err != nil {
-				hlog.Errorf("[cmd] search base images error ! msg: %s\n", err.Error())
+				tlog.Errorf("[cmd] search base images error ! msg: %s\n", err.Error())
 				return
 			}
-			hlog.Infof("output: %s\n", string(out))
+			tlog.Infof("output: %s\n", string(out))
 			r := regexp.MustCompile(`[^\\s]+`)
 			ss := r.FindAllString(strings.Split(string(out), "\n")[1], -1)
 
 			if (len(ss)) < 5 {
-				hlog.Fatalf("[cmd] search base images output error, out msg: %s\n", string(out))
+				tlog.Fatalf("[cmd] search base images output error, out msg: %s\n", string(out))
 			}
 			image := cloud.Image{
 				Name:       ss[0],
@@ -158,11 +158,11 @@ func initBaseImage() {
 			}
 			_, err = collection.InsertOne(context.TODO(), &image)
 			if err != nil {
-				hlog.Errorf("[db] insert base images error ! msg: %s\n", err.Error())
+				tlog.Errorf("[db] insert base images error ! msg: %s\n", err.Error())
 				return
 			}
 		} else {
-			hlog.Error("[db] find base images error ! msg: %s\n", res.Err().Error())
+			tlog.Errorf("[db] find base images error ! msg: %s\n", res.Err().Error())
 		}
 	}
 }
@@ -184,10 +184,10 @@ func initMachineInfo() {
 			global.Machine.Core = 8          // TODO: 核心数
 			_, err := collection.InsertOne(context.TODO(), global.Machine)
 			if err != nil {
-				hlog.Errorf("[db] insert machin info error ! msg: %s\n", err.Error())
+				tlog.Errorf("[db] insert machin info error ! msg: %s\n", err.Error())
 			}
 		}
-		hlog.Errorf("[db] find machine info error ! msg: %s\n", res.Err().Error())
+		tlog.Errorf("[db] find machine info error ! msg: %s\n", res.Err().Error())
 		return
 	}
 	res.Decode(global.Machine)

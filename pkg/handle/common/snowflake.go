@@ -1,11 +1,10 @@
 package commonx
 
 import (
+	"cloud-platform/pkg/load/tlog"
 	"errors"
 	"sync"
 	"time"
-
-	"github.com/cloudwego/hertz/pkg/common/hlog"
 )
 
 type Snowflake struct {
@@ -38,7 +37,7 @@ func GetNextSnowflakeID() int64 {
 			var err error
 			snow, err = newSnowflake(machineId)
 			if err != nil {
-				hlog.Errorf("create snowflake error ! msg: ", err.Error())
+				tlog.Errorf("create snowflake error ! msg: %s", err.Error())
 				return -1
 			}
 		}

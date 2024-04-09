@@ -5,11 +5,11 @@ import (
 	"cloud-platform/pkg/base"
 	"cloud-platform/pkg/base/config"
 	"cloud-platform/pkg/handle"
+	"cloud-platform/pkg/load/tlog"
 	"cloud-platform/pkg/router/manager"
 	"context"
 
 	"github.com/cloudwego/hertz/pkg/app"
-	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"github.com/cloudwego/hertz/pkg/route"
 	"go.mongodb.org/mongo-driver/bson"
 )
@@ -27,7 +27,7 @@ func getUnVerityUsers(ctx context.Context, c *app.RequestContext) {
 	collection := global.GetMgoDb("abcp").Collection("user")
 	res, err := collection.Find(context.TODO(), bson.M{"pow": config.TOURIST_POW})
 	if err != nil {
-		hlog.Errorf("[db] get un-verity user error ! msg: %v\n", err.Error())
+		tlog.Errorf("[db] get un-verity user error ! msg: %v\n", err.Error())
 		r.Error(handle.INTERNAL_ERROR)
 		return
 	}
@@ -47,7 +47,7 @@ func verityUser(ctx context.Context, c *app.RequestContext) {
 	update := bson.M{"$set": bson.M{"pow": config.USER_POW}}
 	_, err := collection.UpdateByID(context.TODO(), id, update)
 	if err != nil {
-		hlog.Errorf("[db] get verity user error ! msg: %v\n", err.Error())
+		tlog.Errorf("[db] get verity user error ! msg: %v\n", err.Error())
 		r.Error(handle.INTERNAL_ERROR)
 		return
 	}
@@ -61,7 +61,7 @@ func setAdmin(ctx context.Context, c *app.RequestContext) {
 	update := bson.M{"$set": bson.M{"pow": 0}}
 	_, err := collection.UpdateByID(context.TODO(), id, update)
 	if err != nil {
-		hlog.Errorf("[db] get verity user error ! msg: %v\n", err.Error())
+		tlog.Errorf("[db] get verity user error ! msg: %v\n", err.Error())
 		r.Error(handle.INTERNAL_ERROR)
 		return
 	}
