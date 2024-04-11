@@ -2,13 +2,14 @@ package router_test
 
 import (
 	"cloud-platform/global"
-	"cloud-platform/internal/base"
-	"cloud-platform/internal/base/config"
-	"cloud-platform/pkg/load"
 
-	commonx "cloud-platform/internal/pkg/common"
-	"cloud-platform/internal/router"
-	_ "cloud-platform/internal/router/api"
+	"cloud-platform/pkg/base"
+	"cloud-platform/pkg/base/config"
+	commonx "cloud-platform/pkg/handle/common"
+	"cloud-platform/pkg/load"
+	"cloud-platform/pkg/router"
+
+	_ "cloud-platform/pkg/router/api"
 	"fmt"
 	"net/http"
 
@@ -24,7 +25,7 @@ const (
 
 func init() {
 	load.Init()
-	r = router.Listen()
+	router.RunServer()
 	setTokenToRedis()
 }
 

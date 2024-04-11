@@ -122,20 +122,18 @@ func initRedis() {
 // 初始化基础镜像
 func initBaseImage() {
 	collection := global.GetMgoDb("abcp").Collection("image")
-	imageName := fmt.Sprintf("%s-abcp_base", global.Config.Docker.Hub.Host)
-	tlog.Infof("image name: %s", imageName)
+	imageName := fmt.Sprintf("%s/abcp_base", global.Config.Docker.Hub.Host)
 	filter := bson.D{{Key: "name", Value: imageName}}
 	res := collection.FindOne(context.TODO(), filter)
 	if res.Err() != nil {
-		tlog.Errorf("[db] find base images error ! msg: %s\n", res.Err().Error())
 		if res.Err() == mongo.ErrNoDocuments {
 			// 拉取远程镜像
-			tlog.Infof("====== [cmd] pull base images ======")
-			_, err := exec.Command(constant.DOCKER, constant.IMAGE_PULL, imageName+":0.1").Output()
+			out, err := exec.Command(constant.DOCKER, constant.IMAGE_PULL, imageName+":0.1").Output()
+			tlog.Infof("out: %s\n", out)
 			if err != nil {
 				tlog.Errorf("[cmd] pull base images error ! msg: %s\n", err.Error())
 			}
-			out, err := exec.Command(constant.DOCKER, constant.IMAGES, imageName+":0.1").Output()
+			out, err = exec.Command(constant.DOCKER, constant.IMAGES, imageName+":0.1").Output()
 			if err != nil {
 				tlog.Errorf("[cmd] search base images error ! msg: %s\n", err.Error())
 				return

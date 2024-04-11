@@ -9,7 +9,6 @@ import (
 	"github.com/cloudwego/hertz/pkg/common/utils"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 	"github.com/cloudwego/hertz/pkg/route"
-	lgr "github.com/sirupsen/logrus"
 )
 
 func init() {
@@ -28,7 +27,5 @@ func Test(ctx context.Context, c *app.RequestContext) {
 }
 
 func Test2(ctx context.Context, c *app.RequestContext) {
-	lgr.Info("logrus - test2222222222222xxx")
-	lgr.Warn("logrus - warn22222222222")
-	c.JSON(consts.StatusOK, utils.H{"ping": "pong"})
+	c.JSON(consts.StatusOK, utils.H{"ping": "pong2"})
 }
