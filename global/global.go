@@ -1,8 +1,8 @@
 package global
 
 import (
-	"cloud-platform/internal/base/cloud"
-	"cloud-platform/internal/base/config"
+	"cloud-platform/pkg/base/cloud"
+	"cloud-platform/pkg/base/config"
 
 	"github.com/go-redis/redis"
 	"go.mongodb.org/mongo-driver/mongo"

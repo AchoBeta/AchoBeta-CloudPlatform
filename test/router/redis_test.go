@@ -2,7 +2,7 @@ package router_test
 
 import (
 	"cloud-platform/global"
-	redisx "cloud-platform/internal/pkg/redis"
+	redisx "cloud-platform/pkg/handle/redis"
 	"context"
 	"fmt"
 	"testing"

@@ -20,7 +20,7 @@ startAbcp() {
         mkdir $cur/log
     fi
     echo "=====运行 abcp====="
-    go run $cur/cmd/main.go -log_dir=$cur/log > $cur/log/log.out 2>&1 &
+    go run $cur/cmd/main.go -log_dir=$cur/log > $cur/logs/log.out 2>&1 &
 }
 stopAbcp() {
     echo "=====停止 abcp====="

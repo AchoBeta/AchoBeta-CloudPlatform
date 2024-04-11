@@ -1,8 +1,8 @@
 package router_test
 
 import (
-	"cloud-platform/internal/handle"
-	requestx "cloud-platform/internal/pkg/request"
+	"cloud-platform/pkg/handle"
+	requestx "cloud-platform/pkg/handle/request"
 	"fmt"
 	"testing"
 )

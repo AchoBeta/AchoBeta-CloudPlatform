@@ -1,7 +1,7 @@
 package command_test
 
 import (
-	"cloud-platform/internal/base/constant"
+	"cloud-platform/pkg/base/constant"
 	"fmt"
 	"os/exec"
 	"strings"

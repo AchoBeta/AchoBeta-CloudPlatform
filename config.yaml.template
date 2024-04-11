@@ -5,13 +5,16 @@ app:
   port: 1210
   startPort: 30000
   salt: MTQ1NzczNDIz    # 哈希加密时用到的盐，可不填
+options:
+  # 只需要写到目录级别
+  logFilePath: ./logs
 
 db:
   mongo:
     address: 
     port: 
-    password: 
     username: 
+    password: 
     authSource: 
   redis:
     address: 

@@ -16,7 +16,8 @@
 # Dependency directories (remove the comment below to include it)
 # vendor/
 rsa/
-log/
+logs/
+*.log
 vendor/
 # ignore database data
 script/database/data/

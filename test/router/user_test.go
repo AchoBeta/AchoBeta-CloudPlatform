@@ -1,10 +1,10 @@
 package router_test
 
 import (
-	"cloud-platform/internal/base"
-	"cloud-platform/internal/base/config"
-	"cloud-platform/internal/handle"
-	requestx "cloud-platform/internal/pkg/request"
+	"cloud-platform/pkg/base"
+	"cloud-platform/pkg/base/config"
+	"cloud-platform/pkg/handle"
+	requestx "cloud-platform/pkg/handle/request"
 	"testing"
 )
 
