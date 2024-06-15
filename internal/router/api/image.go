@@ -15,8 +15,8 @@ func init() {
 	router.Register(func(router gin.IRoutes) {
 		router.GET("/images", getImages)
 		router.GET("/images/:id", getImageInfo)
-		//router.POST("/images/:id/build", buildImage)
-		//router.GET("/images/search", searchImages)
+		// router.POST("/images/:id/build", buildImage)
+		// router.GET("/images/search", searchImages)
 		router.GET("/images/:id/push", pushImage)
 	}, router.V1)
 	router.Register(func(router gin.IRoutes) {
@@ -28,7 +28,7 @@ func init() {
 func getImages(c *gin.Context) {
 	// TODO: 查数据库
 	r := handle.NewResponse(c)
-	err, code, images := service.GetImages()
+	code, images, err := service.GetImages()
 	if code == 0 {
 		r.Success(images)
 	} else if code == 1 {
@@ -45,7 +45,7 @@ func getImageInfo(c *gin.Context) {
 	r := handle.NewResponse(c)
 	id := c.Param("id")
 	image := &cloud.Image{}
-	err, code := service.GetImageInfo(id, image)
+	code, err := service.GetImageInfo(id, image)
 	if code == 0 {
 		r.Success(image)
 	} else if code == 1 {
@@ -76,7 +76,7 @@ func getImageInfo(c *gin.Context) {
 func deleteImage(c *gin.Context) {
 	r := handle.NewResponse(c)
 	id := c.Param("id")
-	err, code := service.DeleteImage(id)
+	code, err := service.DeleteImage(id)
 	if code == 0 {
 		r.Success(nil)
 	} else if code == 1 {
@@ -113,10 +113,10 @@ func pushImage(c *gin.Context) {
 	tag := c.Param("tag")
 	var err error
 	var code int8
-	if global.Config.App.Type == "docker" {
-		err, code = service.PushDockerImage(image + ":" + tag)
+	if global.Config.App.Engine == "docker" {
+		code, err = service.PushDockerImage(image + ":" + tag)
 	} else {
-		err, code = service.PushK8SImage(image + ":" + tag)
+		code, err = service.PushK8SImage(image + ":" + tag)
 	}
 	if code == 0 {
 		r.Success(nil)

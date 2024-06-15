@@ -16,8 +16,8 @@ import (
 func init() {
 	router.Register(func(router gin.IRoutes) {
 		router.GET("/unverity_users", getUnVerityUsers)
-		router.POST("/verity_user/:id", verityUser)
-		router.GET("/set-admin/:id", setAdmin)
+		router.POST("/verity_user", verityUser)
+		router.POST("/set-admin", setAdmin)
 	}, router.V2)
 }
 
@@ -34,6 +34,7 @@ func getUnVerityUsers(c *gin.Context) {
 	for res.Next(context.TODO()) {
 		var user base.DTOUser
 		res.Decode(&user)
+		user.Pow = "tourist"
 		users = append(users, user)
 	}
 	r.Success(users)
@@ -57,7 +58,7 @@ func setAdmin(c *gin.Context) {
 	r := handle.NewResponse(c)
 	id := c.Query("id")
 	collection := global.GetMgoDb("abcp").Collection("user")
-	update := bson.M{"$set": bson.M{"pow": 0}}
+	update := bson.M{"$set": bson.M{"pow": config.ADMIN_POW}}
 	_, err := collection.UpdateByID(context.TODO(), id, update)
 	if err != nil {
 		glog.Errorf("[db] get verity user error ! msg: %v\n", err.Error())

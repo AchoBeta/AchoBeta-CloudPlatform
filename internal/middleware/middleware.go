@@ -7,6 +7,7 @@ import (
 	"cloud-platform/internal/handle"
 	commonx "cloud-platform/internal/pkg/common"
 	"fmt"
+	"net/http"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -15,13 +16,28 @@ import (
 	"github.com/golang/glog"
 )
 
+func Cors() gin.HandlerFunc {
+	return func(context *gin.Context) {
+		method := context.Request.Method
+		context.Header("Access-Control-Allow-Origin", "*")
+		context.Header("Access-Control-Allow-Headers", "Content-Type,AccessToken,X-CSRF-Token,Authorization,Token,x-token")
+		context.Header("Access-Control-Allow-Methods", "POST,GET,OPTIONS,DELETE,PATCH,PUT")
+		context.Header("Access-Control-Expose-Headers", "Content-Length,Access-Control-Allow-Origin,Access-Allow-Headers,Content-Type")
+		context.Header("Access-Control-Allow-Credentials", "true")
+		context.Header("Access-Control-Expose-Headers", "Authorization")
+		if method == "OPTIONS" {
+			context.AbortWithStatus(http.StatusNoContent)
+		}
+	}
+}
+
 func TokenVer() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		r := handle.NewResponse(c)
 		token := c.GetHeader("Authorization")
 		if token == "" {
 			// 无权限
-			r.Ctx.Header("WWW-Authenticate", "Basic")
+			r.Ctx.Header("WWW-Authenticate", "Bearer")
 			r.Ctx.Status(401)
 			c.Abort()
 			return
@@ -54,6 +70,7 @@ func TokenVer() gin.HandlerFunc {
 func AdminVer() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		user, _ := c.Get("user")
+		fmt.Print(user.(*base.User).Pow)
 		if user.(*base.User).Pow != config.ADMIN_POW {
 			r := handle.NewResponse(c)
 			r.Error(handle.INSUFFICENT_PERMISSIONS)
@@ -64,6 +81,7 @@ func AdminVer() gin.HandlerFunc {
 
 func ContainerVer() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		fmt.Print("abcd")
 		r := handle.NewResponse(c)
 		containerId := c.Param("id")
 		user, _ := c.Get("user")

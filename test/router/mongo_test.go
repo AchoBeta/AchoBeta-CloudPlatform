@@ -39,7 +39,7 @@ func TestInsertMany(t *testing.T) {
 
 func TestFindOne(t *testing.T) {
 	collection := global.GetMgoDb("test").Collection("test")
-	filter := bson.D{{"name", "Jack"}}
+	filter := bson.M{"name": "Jack"}
 	var result Student
 	err := collection.FindOne(context.TODO(), filter).Decode(&result)
 	if err != nil {
@@ -51,7 +51,7 @@ func TestFindOne(t *testing.T) {
 
 func TestFindMany(t *testing.T) {
 	collection := global.GetMgoDb("test").Collection("test")
-	filter := bson.D{{"name", "Jack"}}
+	filter := bson.M{"name": "Jack"}
 	cur, err := collection.Find(context.TODO(), filter)
 	if err != nil {
 		t.Errorf("result: %v", err)
@@ -70,8 +70,8 @@ func TestFindMany(t *testing.T) {
 
 func TestUpdateOne(t *testing.T) {
 	collection := global.GetMgoDb("test").Collection("test")
-	filter := bson.D{{"name", "Mark"}}
-	update := bson.D{{"$set", bson.D{{"id", "3333"}}}}
+	filter := bson.M{"name": "Mark"}
+	update := bson.M{"$set": bson.M{"id": "3333"}}
 	res, err := collection.UpdateOne(context.TODO(), filter, update)
 	if err != nil {
 		t.Error(err)
@@ -82,8 +82,8 @@ func TestUpdateOne(t *testing.T) {
 
 func TestUpdateMany(t *testing.T) {
 	collection := global.GetMgoDb("test").Collection("test")
-	filter := bson.D{{"name", "Jack"}}
-	update := bson.D{{"$set", bson.D{{"name", "Tom"}}}}
+	filter := bson.M{"name": "Jack"}
+	update := bson.M{"$set": bson.M{"name": "Tom"}}
 	res, err := collection.UpdateMany(context.TODO(), filter, update)
 	if err != nil {
 		t.Error(err)
@@ -94,7 +94,7 @@ func TestUpdateMany(t *testing.T) {
 
 func TestDeleteOne(t *testing.T) {
 	collection := global.GetMgoDb("test").Collection("test")
-	filter := bson.D{{"name", "Mark"}}
+	filter := bson.M{"name": "Mark"}
 	res, err := collection.DeleteOne(context.TODO(), filter)
 	if err != nil {
 		t.Error(err)
@@ -105,7 +105,7 @@ func TestDeleteOne(t *testing.T) {
 
 func TestDeleteMany(t *testing.T) {
 	collection := global.GetMgoDb("test").Collection("test")
-	filter := bson.D{{"name", "Tom"}}
+	filter := bson.M{"name": "Tom"}
 	res, err := collection.DeleteMany(context.TODO(), filter)
 	if err != nil {
 		t.Error(err)

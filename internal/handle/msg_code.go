@@ -41,6 +41,7 @@ var (
 	IMAGE_PULL_FAIL   = MsgCode{3003, "镜像拉取失败"}
 	IMAGE_PUSH_FAIL   = MsgCode{3004, "镜像上传失败"}
 	IMAGE_REMOVE_FAIL = MsgCode{3005, "镜像删除失败"}
+	IMAGE_EXIST       = MsgCode{3006, "镜像已存在"}
 
 	/* 容器错误 4000 ~ 4999 */
 	CONTAINER_NOT_FOUND    = MsgCode{4001, "容器未找到"}

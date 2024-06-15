@@ -21,6 +21,8 @@ func init() {
 		router.POST("/register", register)
 		router.POST("/login", login)
 		router.GET("/captcha", captcha1)
+		router.GET("/lark-login-page", larkLoginPage)
+		router.GET("lark-login", larkLogin)
 	}, router.V0)
 
 	router.Register(func(router gin.IRoutes) {
@@ -53,8 +55,9 @@ func login(c *gin.Context) {
 		return
 	}
 	user := &base.DTOUser{}
-	err, code, token := service.Login(username, password, captcha, user)
+	code, token, err := service.Login(username, password, captcha, user)
 	if code == 0 {
+		r.Ctx.Header("Access-Control-Expose-Headers", "Authorization")
 		r.Ctx.Header("Authorization", token)
 		r.Success(user)
 	} else if code == 1 {
@@ -120,10 +123,25 @@ func captcha1(c *gin.Context) {
 	}
 }
 
+func larkLoginPage(c *gin.Context) {
+	c.Redirect(http.StatusMovedPermanently, fmt.Sprintf(global.LARK_LOGIN_PAGE_URL,
+		global.Config.App.Lark.AppId, global.Config.App.Lark.RedirectUrl, "11111"))
+}
+
+func larkLogin(c *gin.Context) {
+	code := c.Query("code")
+	r := handle.NewResponse(c)
+	if code == "" {
+		r.Error(handle.PARAM_IS_BLANK)
+		return
+	}
+	service.LarkLogin(code)
+}
+
 func getUsers(c *gin.Context) {
 	r := handle.NewResponse(c)
 	user := &base.DTOUser{}
-	c.BindJSON(user)
+	c.ShouldBind(user)
 	code, users, err := service.GetUsers(user)
 	if code == 0 {
 		r.Success(users)

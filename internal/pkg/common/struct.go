@@ -21,7 +21,7 @@ func StructToMap(value interface{}) map[string]interface{} {
 	return m
 }
 
-func StuctToJson(value interface{}) (string, error) {
+func StructToJson(value interface{}) (string, error) {
 	data, err := json.Marshal(value)
 	if err != nil {
 		return "", err
@@ -32,3 +32,4 @@ func StuctToJson(value interface{}) (string, error) {
 func JsonToStruct(str string, value interface{}) error {
 	return json.Unmarshal([]byte(str), value)
 }
+

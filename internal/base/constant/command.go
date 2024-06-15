@@ -31,3 +31,14 @@ const (
 	// rmi my-hello-world:0.2
 	IMAGE_REMOVE string = "rmi"
 )
+
+const (
+	K8S string = "kubectl"
+	// kubectl run base --image=achobeta/abcp-base:0.2 --env="SHELL_PWD=123456" --port=22 --port=23
+	K8S_RUN string = "run"
+	// kubectl expose pods base --port=1000 --target-port=80 --type=NodePort
+	K8S_EXPOST string = "expost"
+	K8S_GET    string = "get"
+	K8S_DELETE string = "delete"
+	K8S_LOG    string = "logs"
+)
