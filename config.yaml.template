@@ -1,10 +1,14 @@
 app:
   name: abcp
-  type: docker
+  engine: docker
   host: 127.0.0.1
   port: 1210
   startPort: 30000
   salt: MTQ1NzczNDIz    # 哈希加密时用到的盐，可不填
+  lark:
+    appId: xxxx
+    appSecret: xxx
+    redirectUrl: xxxx
 
 db:
   mongo:
