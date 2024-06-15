@@ -4,7 +4,7 @@ import (
 	"cloud-platform/global"
 	"cloud-platform/internal/base/cloud"
 	"cloud-platform/internal/base/config"
-
+	"cloud-platform/internal/base/constant"
 	"context"
 	"fmt"
 	"net/http"
@@ -31,13 +31,13 @@ func Init(path string) {
 }
 
 func readConfig(file string) {
-	//导入配置文件
+	// 导入配置文件
 	global.Config = &config.Server{}
 	yamlFile, err := os.ReadFile(file)
 	if err != nil {
 		panic(err.Error())
 	}
-	//将配置文件读取到结构体中
+	// 将配置文件读取到结构体中
 	err = yaml.Unmarshal(yamlFile, global.Config)
 	if err != nil {
 		panic(err.Error())
@@ -121,7 +121,7 @@ func initBaseImage() {
 	// }
 	if res.Err() != nil {
 		if res.Err() == mongo.ErrNoDocuments {
-			out, err := exec.Command(base.DOCKER, base.IMAGES, imageName+":0.2").Output()
+			out, err := exec.Command(constant.DOCKER, constant.IMAGES, imageName+":0.2").Output()
 			if err != nil {
 				glog.Errorf("[cmd] search base images error ! msg: %s\n", err.Error())
 				return
@@ -129,7 +129,7 @@ func initBaseImage() {
 			fmt.Print(string(out))
 			ss := strings.Split(string(out), "\n")
 			ss = strings.Split(ss[1], " ")
-			image := base.Image{
+			image := cloud.Image{
 				Name:       imageName,
 				Tag:        "0.2",
 				Id:         ss[10],

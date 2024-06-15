@@ -1,7 +1,8 @@
 package global
 
 import (
-	"CloudPlatform/config"
+	"cloud-platform/internal/base/cloud"
+	"cloud-platform/internal/base/config"
 	"net/http"
 
 	"github.com/go-redis/redis"
@@ -10,7 +11,7 @@ import (
 
 var (
 	Config     *config.Server
-	Machine    *base.Machine
+	Machine    *cloud.Machine
 	Mgo        *mongo.Client
 	Rdb        *redis.Client
 	HttpClient *http.Client

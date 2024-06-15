@@ -1,12 +1,12 @@
 package service
 
 import (
-	"CloudPlatform/config"
-	"CloudPlatform/global"
-	"CloudPlatform/internal/base"
-	"CloudPlatform/internal/handle"
-	commonx "CloudPlatform/pkg/common"
-	requestx "CloudPlatform/pkg/request"
+	"cloud-platform/global"
+	"cloud-platform/internal/base"
+	"cloud-platform/internal/base/config"
+	"cloud-platform/internal/handle"
+	commonx "cloud-platform/internal/pkg/common"
+	requestx "cloud-platform/internal/pkg/request"
 	"context"
 	"crypto/sha256"
 	"encoding/base64"
@@ -16,7 +16,7 @@ import (
 	"io"
 	"time"
 
-	"github.com/go-redis/redis/v9"
+	"github.com/go-redis/redis"
 	"github.com/golang/glog"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -51,7 +51,7 @@ func Login(username, password, captcha string, dtoUser *base.DTOUser) (int8, str
 	}
 	token := createToken()
 	str, _ := commonx.StructToJson(&user)
-	cmd1 := global.Rdb.Set(context.TODO(), fmt.Sprintf(base.TOKEN, token), str, 30*time.Hour)
+	cmd1 := global.Rdb.Set(fmt.Sprintf(base.TOKEN, token), str, 30*time.Hour)
 	if cmd1.Err() != nil {
 		return 6, "", cmd1.Err()
 	}
@@ -63,7 +63,7 @@ func Login(username, password, captcha string, dtoUser *base.DTOUser) (int8, str
 		dtoUser.Pow = "admin"
 	} else if user.Pow == config.USER_POW {
 		dtoUser.Pow = "user"
-	} 
+	}
 	dtoUser.Containers = user.Containers
 	return 0, token, nil
 }

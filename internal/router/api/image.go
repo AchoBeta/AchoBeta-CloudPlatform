@@ -2,6 +2,7 @@ package api
 
 import (
 	"cloud-platform/global"
+	"cloud-platform/internal/base/cloud"
 	"cloud-platform/internal/handle"
 	"cloud-platform/internal/router"
 	"cloud-platform/internal/service"
@@ -14,8 +15,8 @@ func init() {
 	router.Register(func(router gin.IRoutes) {
 		router.GET("/images", getImages)
 		router.GET("/images/:id", getImageInfo)
-		//router.POST("/images/:id/build", buildImage)
-		//router.GET("/images/search", searchImages)
+		// router.POST("/images/:id/build", buildImage)
+		// router.GET("/images/search", searchImages)
 		router.GET("/images/:id/push", pushImage)
 	}, router.V1)
 	router.Register(func(router gin.IRoutes) {
@@ -43,7 +44,7 @@ func getImages(c *gin.Context) {
 func getImageInfo(c *gin.Context) {
 	r := handle.NewResponse(c)
 	id := c.Param("id")
-	image := &base.Image{}
+	image := &cloud.Image{}
 	code, err := service.GetImageInfo(id, image)
 	if code == 0 {
 		r.Success(image)

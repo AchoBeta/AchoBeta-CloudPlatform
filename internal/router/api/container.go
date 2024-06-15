@@ -33,7 +33,7 @@ func init() {
 // 创建容器
 func createContainer(c *gin.Context) {
 	r := handle.NewResponse(c)
-	container := &base.Container{}
+	container := &cloud.Container{}
 	err := c.ShouldBind(&container)
 	user, _ := c.Get("user")
 	if err != nil || container.Image == "" || container.Name == "" {
@@ -60,7 +60,7 @@ func createContainer(c *gin.Context) {
 func getContainer(c *gin.Context) {
 	r := handle.NewResponse(c)
 	id := c.Param("id")
-	container := &base.Container{}
+	container := &cloud.Container{}
 	code, err := service.GetContainer(id, container)
 	if code == 0 {
 		r.Success(container)

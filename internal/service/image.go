@@ -3,6 +3,7 @@ package service
 import (
 	"cloud-platform/global"
 	"cloud-platform/internal/base/cloud"
+	"cloud-platform/internal/base/constant"
 	"context"
 	"os/exec"
 
@@ -10,7 +11,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func GetImages() (int8, []base.Image, error) {
+func GetImages() (int8, []cloud.Image, error) {
 	collection := global.GetMgoDb("abcp").Collection("image")
 	cur, err := collection.Find(context.TODO(), bson.M{"isDelete": false})
 	if err != nil {
@@ -28,7 +29,7 @@ func GetImages() (int8, []base.Image, error) {
 	return 0, images, nil
 }
 
-func GetImageInfo(imageId string, image *base.Image) (int8, error) {
+func GetImageInfo(imageId string, image *cloud.Image) (int8, error) {
 	collection := global.GetMgoDb("abcp").Collection("image")
 	res := collection.FindOne(context.TODO(), bson.M{"_id": imageId})
 	if res.Err() != nil {
@@ -58,7 +59,7 @@ func DeleteImage(imageId string) (int8, error) {
 }
 
 func PushDockerImage(imageName string) (int8, error) {
-	_, err := exec.Command(base.DOCKER, base.IMAGE_PUSH, imageName).Output()
+	_, err := exec.Command(constant.DOCKER, constant.IMAGE_PUSH, imageName).Output()
 	if err != nil {
 		return 1, err
 	}

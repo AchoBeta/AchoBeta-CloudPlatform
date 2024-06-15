@@ -6,7 +6,6 @@ import (
 	"cloud-platform/internal/base/config"
 	"cloud-platform/internal/handle"
 	commonx "cloud-platform/internal/pkg/common"
-	"context"
 	"fmt"
 	"net/http"
 	"time"
@@ -57,7 +56,7 @@ func TokenVer() gin.HandlerFunc {
 		}
 		user := &base.User{}
 		commonx.JsonToStruct(cmd.Val(), user)
-		cmd1 := global.Rdb.Expire(context.TODO(), fmt.Sprintf(base.TOKEN, token), 30*time.Minute)
+		cmd1 := global.Rdb.Expire(fmt.Sprintf(base.TOKEN, token), 30*time.Minute)
 		if cmd1.Err() != nil {
 			glog.Errorf("token extension of time error ! msg: %s\n", cmd1.Err().Error())
 			c.Abort()
